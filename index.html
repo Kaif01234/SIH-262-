@@ -1,0 +1,2520 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AICTE FlowTrack | Approval Workflow & Compliance Monitoring (SIH26262 - Verifix 5)</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            aicte: {
+              navy: '#0f172a',
+              blue: '#1d4ed8',
+              gold: '#d97706',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+    /* Custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.4);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(100, 116, 139, 0.7);
+    }
+    /* Smooth progress bar transitions */
+    .bar-fill {
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    /* Subtle pulse for overdue badges */
+    @keyframes pulse-soft {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    .pulse-badge {
+      animation: pulse-soft 2s infinite;
+    }
+    @media print {
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-[#090d16] dark:text-slate-100 min-h-screen flex flex-col selection:bg-blue-600 selection:text-white">
+
+  <!-- ============================================================================
+       TOP PROTOTYPE STATUS & DISCLAIMER BAR
+  ============================================================================= -->
+  <div id="topBanner" class="no-print bg-slate-900 text-slate-200 border-b border-slate-800 px-4 py-1.5 text-xs z-40">
+    <div class="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center space-x-2">
+        <span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 font-mono font-semibold text-[11px]">
+          SIH26262 &bull; Team Verifix 5 (ID: 199765)
+        </span>
+        <span class="text-slate-300 font-medium hidden md:inline">
+          Integrated AICTE Approval Workflow Automation, Compliance Monitoring &amp; Alert Management System
+        </span>
+      </div>
+      <div class="flex items-center space-x-3 text-[11px] text-slate-400">
+        <span class="flex items-center space-x-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>Prototype Demonstration &bull; Illustrative Sample Data &bull; Final scrutiny and approval decisions remain with authorised AICTE officials.</span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================================
+       MAIN APPLICATION LAYOUT (SIDEBAR + WORKSPACE)
+  ============================================================================= -->
+  <div class="flex-1 flex overflow-hidden">
+
+    <!-- LEFT NAVIGATION SIDEBAR (Matches Slide 2 Navy Sidebar Design) -->
+    <aside id="sidebar" class="no-print w-64 bg-[#0f1f38] dark:bg-[#0c1322] text-white flex flex-col justify-between border-r border-slate-800 shrink-0 select-none transition-all">
+      <div>
+        <!-- Brand Header -->
+        <div class="p-4 border-b border-slate-700/60 flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md border border-blue-400/30 shrink-0">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </div>
+          <div>
+            <div class="font-bold text-base tracking-tight text-white flex items-center gap-1.5">
+              <span>AICTE FlowTrack</span>
+            </div>
+            <div class="text-[11px] text-blue-200/80 font-medium">Approval &amp; Compliance</div>
+          </div>
+        </div>
+
+        <!-- Active Role Indicator Card inside Sidebar -->
+        <div class="mx-3 mt-3 p-2.5 rounded-lg bg-slate-800/70 border border-slate-700/70">
+          <div class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Active Workspace Role</div>
+          <div id="sidebarRoleLabel" class="text-xs font-bold text-emerald-400 mt-0.5 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span>AICTE Official (Scrutiny/EVC)</span>
+          </div>
+          <div id="sidebarRoleSub" class="text-[10px] text-slate-400 mt-0.5">Regional / Bureau / Committees</div>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="mt-4 px-2 space-y-1" aria-label="Main Navigation">
+          <button onclick="navigate('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold transition-all bg-blue-600 text-white shadow-sm">
+            <div class="flex items-center space-x-2.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+              <span>Dashboard</span>
+            </div>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/40 text-white font-mono" id="nav-badge-total">1,292</span>
+          </button>
+
+          <button onclick="navigate('applications')" id="nav-applications" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition-all">
+            <div class="flex items-center space-x-2.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              <span>Applications &amp; APH Routing</span>
+            </div>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-mono" id="nav-badge-pending">672</span>
+          </button>
+
+          <button onclick="navigate('portal')" id="nav-portal" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition-all">
+            <div class="flex items-center space-x-2.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+              <span>Institution Portal</span>
+            </div>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-semibold">+ Submit</span>
+          </button>
+
+          <button onclick="navigate('evc')" id="nav-evc" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition-all">
+            <div class="flex items-center space-x-2.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <span>EVC Management</span>
+            </div>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 font-mono" id="nav-badge-evc">86</span>
+          </button>
+
+          <button onclick="navigate('compliance')" id="nav-compliance" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition-all">
+            <div class="flex items-center space-x-2.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+              <span>Compliance &amp; Undertakings</span>
+            </div>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-700 text-slate-300 font-mono" id="nav-badge-compliance">62%</span>
+          </button>
+
+          <button onclick="navigate('documents')" id="nav-documents" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition-all">
+            <div class="flex items-center space-x-2.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span>Document Expiry Monitor</span>
+            </div>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-red-500/30 text-red-300 font-mono" id="nav-badge-expiry">5 Alerts</span>
+          </button>
+
+          <button onclick="navigate('alerts')" id="nav-alerts" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition-all">
+            <div class="flex items-center space-x-2.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+              <span>Alerts &amp; Escalation Rules</span>
+            </div>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-200 font-mono" id="nav-badge-alerts">Active</span>
+          </button>
+
+          <button onclick="navigate('reports')" id="nav-reports" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition-all">
+            <div class="flex items-center space-x-2.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              <span>Reports &amp; Audit Trail</span>
+            </div>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Sidebar Footer: APH Reference & Human-in-the-Loop Notice -->
+      <div class="p-3 m-3 rounded-lg bg-slate-900/90 border border-slate-700/70 text-[11px] text-slate-300 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="font-semibold text-blue-300">APH 2024–27 Aligned</span>
+          <span class="px-1.5 py-0.5 rounded bg-slate-800 text-[10px] font-mono text-slate-400">v1.0 Demo</span>
+        </div>
+        <p class="text-[10px] text-slate-400 leading-relaxed">
+          Configurable approval routes follow the AICTE Approval Process Handbook. Human-in-the-loop authority enforced.
+        </p>
+      </div>
+    </aside>
+
+    <!-- ============================================================================
+         RIGHT MAIN CONTENT AREA
+    ============================================================================= -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+
+      <!-- TOP HEADER BAR (Search, Role Switcher, Theme Toggle, Reset Data) -->
+      <header class="no-print bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 lg:px-6 py-3 flex flex-wrap items-center justify-between gap-3 z-30">
+        
+        <!-- Left: Global Search Input -->
+        <div class="flex items-center space-x-3 flex-1 min-w-[240px] max-w-md">
+          <div class="relative w-full">
+            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <input 
+              id="globalSearchInput" 
+              type="text" 
+              oninput="handleGlobalSearch(this.value)"
+              placeholder="Search application ID, college name, region, APH route..." 
+              class="w-full pl-9 pr-4 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/90 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        </div>
+
+        <!-- Right: Role Switcher, Alert Bell, Light/Dark Toggle, Reset Demo -->
+        <div class="flex items-center flex-wrap gap-2.5">
+          
+          <!-- Dual Role Switcher -->
+          <div class="inline-flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700">
+            <button 
+              id="roleBtnOfficial" 
+              onclick="switchUserRole('official')" 
+              class="px-2.5 py-1 rounded-md text-xs font-semibold transition-all bg-blue-600 text-white shadow-sm flex items-center gap-1.5"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+              <span>AICTE Official View</span>
+            </button>
+            <button 
+              id="roleBtnInstitution" 
+              onclick="switchUserRole('institution')" 
+              class="px-2.5 py-1 rounded-md text-xs font-semibold transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white flex items-center gap-1.5"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/></svg>
+              <span>Institution Portal View</span>
+            </button>
+          </div>
+
+          <!-- Quick Notification Bell -->
+          <button onclick="navigate('alerts')" class="relative p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors" title="View Alerts & Escalations">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+            <span id="headerBellCount" class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-600 text-white text-[10px] font-bold flex items-center justify-center">6</span>
+          </button>
+
+          <!-- Light Mode / Dark Mode Toggle Button -->
+          <button 
+            id="themeToggleBtn" 
+            onclick="toggleTheme()" 
+            class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center space-x-1.5 transition-colors shadow-sm"
+            title="Switch between Light Mode and Dark Mode"
+          >
+            <!-- Sun Icon (shown in Dark Mode) -->
+            <svg id="iconSun" class="w-4 h-4 text-amber-400 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+            <!-- Moon Icon (shown in Light Mode) -->
+            <svg id="iconMoon" class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            </svg>
+            <span id="themeToggleLabel">Dark Mode</span>
+          </button>
+
+          <!-- Reset Demo Data Button -->
+          <button 
+            onclick="openResetConfirmModal()" 
+            class="px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:border-rose-300 dark:hover:border-rose-800 text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-300 transition-colors"
+            title="Reset all demo metrics and records back to default baseline"
+          >
+            Reset Demo
+          </button>
+        </div>
+      </header>
+
+      <!-- ============================================================================
+           SCROLLABLE VIEWPORT CONTAINING ALL 8 MODULES
+      ============================================================================= -->
+      <main class="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6 max-w-[1600px] w-full mx-auto">
+
+        <!-- ==========================================================================
+             VIEW 1: DASHBOARD (Matches Corrected Final Slide 2 Layout & Reconciled Counts)
+        =========================================================================== -->
+        <section id="view-dashboard" class="space-y-6">
+          
+          <!-- Top Banner Title & Quick Actions -->
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <h1 class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                  AICTE Approval Workflow &amp; Compliance Dashboard
+                </h1>
+                <span class="px-2.5 py-0.5 text-[11px] font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                  APH 2024–27 Cycle
+                </span>
+              </div>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Unified real-time monitoring of application stages, EVC schedules, institutional undertakings, and document expiry alerts.
+              </p>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <button onclick="navigate('portal')" class="px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm flex items-center gap-1.5 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                <span>Submit Sample Application</span>
+              </button>
+              <button onclick="triggerSlaScan()" class="px-3.5 py-2 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30 text-xs font-semibold flex items-center gap-1.5 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                <span>Run SLA &amp; Expiry Alert Scan</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 4 KPI SUMMARY CARDS (Slide 2 Exact Reconciled Numbers: 1,292 | 312 | 86 | 620) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Total Applications -->
+            <div onclick="navigate('applications')" class="cursor-pointer group rounded-xl p-4 bg-blue-50/90 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/60 shadow-sm hover:shadow-md transition-all flex items-center justify-between">
+              <div>
+                <div class="text-xs font-semibold text-blue-800 dark:text-blue-300">Total Applications</div>
+                <div id="kpi-total" class="text-2xl lg:text-3xl font-extrabold text-blue-950 dark:text-white mt-1 font-mono">1,292</div>
+                <div class="text-[11px] text-blue-700/80 dark:text-blue-400 mt-1">672 active in workflow &bull; 620 approved</div>
+              </div>
+              <div class="w-11 h-11 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              </div>
+            </div>
+
+            <!-- Under Scrutiny -->
+            <div onclick="filterApplicationsByStage('Scrutiny')" class="cursor-pointer group rounded-xl p-4 bg-amber-50/90 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/60 shadow-sm hover:shadow-md transition-all flex items-center justify-between">
+              <div>
+                <div class="text-xs font-semibold text-amber-800 dark:text-amber-300">Under Scrutiny</div>
+                <div id="kpi-scrutiny" class="text-2xl lg:text-3xl font-extrabold text-amber-950 dark:text-white mt-1 font-mono">312</div>
+                <div class="text-[11px] text-amber-700/80 dark:text-amber-400 mt-1">+ 118 in Re-scrutiny verification</div>
+              </div>
+              <div class="w-11 h-11 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+              </div>
+            </div>
+
+            <!-- Pending at EVC -->
+            <div onclick="navigate('evc')" class="cursor-pointer group rounded-xl p-4 bg-rose-50/90 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/60 shadow-sm hover:shadow-md transition-all flex items-center justify-between">
+              <div>
+                <div class="text-xs font-semibold text-rose-800 dark:text-rose-300">Pending at EVC</div>
+                <div id="kpi-evc" class="text-2xl lg:text-3xl font-extrabold text-rose-950 dark:text-white mt-1 font-mono">86</div>
+                <div class="text-[11px] text-rose-700/80 dark:text-rose-400 mt-1">Expert Visit Committee inspections</div>
+              </div>
+              <div class="w-11 h-11 rounded-xl bg-rose-500 text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              </div>
+            </div>
+
+            <!-- Approved -->
+            <div onclick="filterApplicationsByStage('Approved')" class="cursor-pointer group rounded-xl p-4 bg-emerald-50/90 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/60 shadow-sm hover:shadow-md transition-all flex items-center justify-between">
+              <div>
+                <div class="text-xs font-semibold text-emerald-800 dark:text-emerald-300">Approved (EoA / LoA)</div>
+                <div id="kpi-approved" class="text-2xl lg:text-3xl font-extrabold text-emerald-950 dark:text-white mt-1 font-mono">620</div>
+                <div class="text-[11px] text-emerald-700/80 dark:text-emerald-400 mt-1">102 in final council approval queue</div>
+              </div>
+              <div class="w-11 h-11 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- MIDDLE CHARTS ROW: STAGE-WISE PENDENCY & COMPLIANCE STATUS -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Left 7 Cols: Stage-wise Pendency Bar Chart (312, 118, 86, 54, 102) -->
+            <div class="lg:col-span-7 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-4">
+                  <div>
+                    <h2 class="text-sm font-bold text-slate-900 dark:text-white">Stage-wise Pendency Breakdown</h2>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400">Click any stage bar to filter applications in that approval stage (672 active)</p>
+                  </div>
+                  <span class="text-xs font-mono font-semibold px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                    Active Queue: <span id="chartTotalActive">672</span>
+                  </span>
+                </div>
+
+                <!-- Dynamic Stage Bars Container -->
+                <div id="stageBarsContainer" class="space-y-3.5 mt-2">
+                  <!-- Populated dynamically by renderDashboard() -->
+                </div>
+              </div>
+
+              <!-- APH Route Pills Legend -->
+              <div class="mt-5 pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500 dark:text-slate-400">
+                <span>Applicable APH Routes:</span>
+                <div class="flex flex-wrap gap-1.5">
+                  <span class="px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 font-medium">Only Scrutiny</span>
+                  <span class="px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-medium">Scrutiny + EVC</span>
+                  <span class="px-2 py-0.5 rounded bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 font-medium">EVC + SAC/SHC</span>
+                  <span class="px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 font-medium">Only EVC</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right 5 Cols: Compliance Status Donut Chart (62% Compliant, 22% Pending, 16% Overdue) -->
+            <div class="lg:col-span-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm flex flex-col justify-between">
+              <div class="flex items-center justify-between mb-2">
+                <div>
+                  <h2 class="text-sm font-bold text-slate-900 dark:text-white">Institutional Compliance Status</h2>
+                  <p class="text-[11px] text-slate-500 dark:text-slate-400">Undertakings, affidavits &amp; regulatory conditions</p>
+                </div>
+                <button onclick="navigate('compliance')" class="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline">View All &rarr;</button>
+              </div>
+
+              <div class="flex flex-col sm:flex-row items-center justify-around my-auto py-2 gap-6">
+                <!-- SVG Donut Chart -->
+                <div class="relative w-40 h-40 flex items-center justify-center shrink-0">
+                  <svg class="w-full h-full -rotate-90" viewBox="0 0 36 36">
+                    <!-- Background Circle -->
+                    <circle cx="18" cy="18" r="15.9155" fill="transparent" stroke="currentColor" class="text-slate-100 dark:text-slate-800" stroke-width="4.2"></circle>
+                    <!-- Compliant Segment (62%) -->
+                    <circle id="donutCompliant" cx="18" cy="18" r="15.9155" fill="transparent" stroke="#10b981" stroke-width="4.2" stroke-dasharray="62 38" stroke-dashoffset="0"></circle>
+                    <!-- Pending Segment (22%) -->
+                    <circle id="donutPending" cx="18" cy="18" r="15.9155" fill="transparent" stroke="#f59e0b" stroke-width="4.2" stroke-dasharray="22 78" stroke-dashoffset="-62"></circle>
+                    <!-- Overdue Segment (16%) -->
+                    <circle id="donutOverdue" cx="18" cy="18" r="15.9155" fill="transparent" stroke="#ef4444" stroke-width="4.2" stroke-dasharray="16 84" stroke-dashoffset="-84"></circle>
+                  </svg>
+                  <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                    <span id="donutCenterTotal" class="text-xl font-extrabold text-slate-900 dark:text-white font-mono">1,292</span>
+                    <span class="text-[10px] font-medium text-slate-500 dark:text-slate-400">Institutions</span>
+                  </div>
+                </div>
+
+                <!-- Legend & Percentages -->
+                <div class="space-y-3 w-full max-w-[200px]">
+                  <div class="flex items-center justify-between p-2 rounded-lg bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-900/50">
+                    <div class="flex items-center space-x-2">
+                      <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                      <span class="text-xs font-semibold text-slate-700 dark:text-slate-200">Compliant</span>
+                    </div>
+                    <span id="legendCompliantPct" class="text-xs font-bold font-mono text-emerald-700 dark:text-emerald-400">62%</span>
+                  </div>
+
+                  <div class="flex items-center justify-between p-2 rounded-lg bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-900/50">
+                    <div class="flex items-center space-x-2">
+                      <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                      <span class="text-xs font-semibold text-slate-700 dark:text-slate-200">Pending</span>
+                    </div>
+                    <span id="legendPendingPct" class="text-xs font-bold font-mono text-amber-700 dark:text-amber-400">22%</span>
+                  </div>
+
+                  <div class="flex items-center justify-between p-2 rounded-lg bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/60 dark:border-rose-900/50">
+                    <div class="flex items-center space-x-2">
+                      <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                      <span class="text-xs font-semibold text-slate-700 dark:text-slate-200">Overdue</span>
+                    </div>
+                    <span id="legendOverduePct" class="text-xs font-bold font-mono text-rose-700 dark:text-rose-400">16%</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+                <span>Auto-escalation enabled for overdue undertakings</span>
+                <button onclick="navigate('alerts')" class="text-blue-600 dark:text-blue-400 font-medium hover:underline">Configure Rules</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- BOTTOM TABLES ROW: UPCOMING EVC SCHEDULE & DOCUMENT EXPIRY ALERTS (Slide 2 Bottom Panels) -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Left 6 Cols: Upcoming EVC Schedule -->
+            <div class="lg:col-span-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <h2 class="text-sm font-bold text-slate-900 dark:text-white">Upcoming EVC Schedule</h2>
+                  <p class="text-[11px] text-slate-500 dark:text-slate-400">Expert Visit Committee inspections &amp; report tracking</p>
+                </div>
+                <button onclick="navigate('evc')" class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-semibold text-blue-600 dark:text-blue-400 transition-colors">
+                  Manage EVC &rarr;
+                </button>
+              </div>
+
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr class="border-b border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 uppercase">
+                      <th class="py-2 pr-3 font-semibold">Date</th>
+                      <th class="py-2 px-3 font-semibold">Institute Name</th>
+                      <th class="py-2 px-3 font-semibold">Region</th>
+                      <th class="py-2 px-3 font-semibold">Status</th>
+                      <th class="py-2 pl-3 text-right font-semibold">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dashboardEvcTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/70">
+                    <!-- Populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Right 6 Cols: Document Expiry Alerts -->
+            <div class="lg:col-span-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <h2 class="text-sm font-bold text-slate-900 dark:text-white">Document Expiry Alerts</h2>
+                  <p class="text-[11px] text-slate-500 dark:text-slate-400">Lease agreements, fire safety NOCs &amp; building plans</p>
+                </div>
+                <button onclick="navigate('documents')" class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-semibold text-blue-600 dark:text-blue-400 transition-colors">
+                  All Documents &rarr;
+                </button>
+              </div>
+
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr class="border-b border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 uppercase">
+                      <th class="py-2 pr-3 font-semibold">Institute Name</th>
+                      <th class="py-2 px-3 font-semibold">Document</th>
+                      <th class="py-2 px-3 font-semibold">Expiry Date</th>
+                      <th class="py-2 px-3 font-semibold">Status</th>
+                      <th class="py-2 pl-3 text-right font-semibold">Alert</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dashboardExpiryTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/70">
+                    <!-- Populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ==========================================================================
+             VIEW 2: APPLICATIONS & CONFIGURABLE APH WORKFLOW ROUTING
+        =========================================================================== -->
+        <section id="view-applications" class="hidden space-y-6">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h1 class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                Applications &amp; Configurable APH Workflow Routing
+              </h1>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Each application follows its applicable Approval Process Handbook (APH) route. Authorised officials can inspect documents, advance stages, or flag defects.
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="openAphRouteMatrixModal()" class="px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-1.5 shadow-sm">
+                <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                <span>View APH Route Rules Matrix</span>
+              </button>
+              <button onclick="navigate('portal')" class="px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm">
+                + New Application
+              </button>
+            </div>
+          </div>
+
+          <!-- Filter Bar -->
+          <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 shadow-sm grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Search Application / College</label>
+              <input id="appFilterSearch" type="text" oninput="renderApplicationsTable()" placeholder="ID or Institute name..." class="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Current Workflow Stage</label>
+              <select id="appFilterStage" onchange="renderApplicationsTable()" class="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white">
+                <option value="ALL">All Stages</option>
+                <option value="Scrutiny">Scrutiny</option>
+                <option value="Re-scrutiny">Re-scrutiny</option>
+                <option value="EVC">EVC (Expert Visit Committee)</option>
+                <option value="SAC/SHC">SAC/SHC Appeal/Hearing</option>
+                <option value="Approval">Final Council Approval Queue</option>
+                <option value="Approved">Approved (EoA/LoA Issued)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Assigned APH Route</label>
+              <select id="appFilterRoute" onchange="renderApplicationsTable()" class="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white">
+                <option value="ALL">All APH Routes</option>
+                <option value="Only Scrutiny">Only Scrutiny</option>
+                <option value="Scrutiny + EVC">Scrutiny + EVC</option>
+                <option value="EVC + SAC/SHC">EVC + SAC/SHC</option>
+                <option value="Only EVC">Only EVC</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">AICTE Region</label>
+              <select id="appFilterRegion" onchange="renderApplicationsTable()" class="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white">
+                <option value="ALL">All Regions</option>
+                <option value="Western">Western</option>
+                <option value="Northern">Northern</option>
+                <option value="Southern">Southern</option>
+                <option value="Eastern">Eastern</option>
+                <option value="Central">Central</option>
+              </select>
+            </div>
+            <div class="flex items-end">
+              <button onclick="resetAppFilters()" class="w-full px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Clear Filters
+              </button>
+            </div>
+          </div>
+
+          <!-- Applications Table -->
+          <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 uppercase">
+                    <th class="py-3 px-4 font-semibold">Application ID</th>
+                    <th class="py-3 px-4 font-semibold">Institution &amp; Permanent ID</th>
+                    <th class="py-3 px-3 font-semibold">Region</th>
+                    <th class="py-3 px-3 font-semibold">Application Type</th>
+                    <th class="py-3 px-3 font-semibold">APH Route</th>
+                    <th class="py-3 px-3 font-semibold">Current Stage</th>
+                    <th class="py-3 px-3 font-semibold">Assigned Officer</th>
+                    <th class="py-3 px-3 font-semibold">SLA / Due Date</th>
+                    <th class="py-3 px-4 text-right font-semibold">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="applicationsTableBody" class="divide-y divide-slate-100 dark:divide-slate-800">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================================================
+             VIEW 3: INSTITUTION PORTAL (Submit Application & Track Status)
+        =========================================================================== -->
+        <section id="view-portal" class="hidden space-y-6">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h1 class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                Institution Application Portal
+              </h1>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Submit AICTE approval applications, upload statutory documents with expiry dates, and track real-time stage progression under APH 2024–27.
+              </p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Left 7 Cols: New Application Submission Form -->
+            <div class="lg:col-span-7 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+              <div class="border-b border-slate-200 dark:border-slate-800 pb-3 mb-4 flex items-center justify-between">
+                <div>
+                  <h2 class="text-base font-bold text-slate-900 dark:text-white">Submit New Approval Application</h2>
+                  <p class="text-[11px] text-slate-500 dark:text-slate-400">Workflow Engine automatically assigns the APH route based on application category.</p>
+                </div>
+                <span class="px-2.5 py-1 rounded bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-xs font-mono font-semibold">
+                  APH 2024–27 Form
+                </span>
+              </div>
+
+              <form id="newAppForm" onsubmit="submitNewApplication(event)" class="space-y-4 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Institution Name *</label>
+                    <input id="formInstName" type="text" required value="Vidya Mandir Institute of Engineering & Tech" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                  </div>
+                  <div>
+                    <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">AICTE Permanent ID *</label>
+                    <input id="formPermId" type="text" required value="1-4890213411" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">AICTE Region *</label>
+                    <select id="formRegion" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white">
+                      <option value="Western">Western Region</option>
+                      <option value="Northern">Northern Region</option>
+                      <option value="Southern">Southern Region</option>
+                      <option value="Eastern">Eastern Region</option>
+                      <option value="Central">Central Region</option>
+                    </select>
+                  </div>
+                  <div class="sm:col-span-2">
+                    <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Application Category (Determines APH Route) *</label>
+                    <select id="formAppType" onchange="updateFormRoutePreview()" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-medium">
+                      <option value="New Course / Increase in Intake">New Course / Increase in Intake (Route: Scrutiny + EVC)</option>
+                      <option value="Extension of Approval (EoA)">Extension of Approval - Standard (Route: Only Scrutiny)</option>
+                      <option value="New Technical Institution (LoA)">New Technical Institution - LoA (Route: Scrutiny + EVC)</option>
+                      <option value="Appeal / Restoration of Intake">Appeal / Restoration of Intake (Route: EVC + SAC/SHC)</option>
+                      <option value="Change of Site / Infrastructure Verification">Change of Site / Infrastructure Verification (Route: Only EVC)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Dynamic APH Route Preview Banner -->
+                <div class="p-3 rounded-lg bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900 flex items-center justify-between">
+                  <div>
+                    <div class="text-[11px] font-bold text-blue-900 dark:text-blue-200">Auto-Selected APH Workflow Route:</div>
+                    <div id="formRouteStepsPreview" class="text-xs text-blue-700 dark:text-blue-300 font-medium mt-0.5">
+                      1. Registration &rarr; 2. Scrutiny &rarr; 3. EVC Inspection &rarr; 4. Final Approval
+                    </div>
+                  </div>
+                  <span id="formRouteBadge" class="px-2.5 py-1 rounded-full bg-blue-600 text-white text-[11px] font-semibold">
+                    Scrutiny + EVC
+                  </span>
+                </div>
+
+                <!-- Statutory Documents & Expiry Dates -->
+                <div class="pt-2 border-t border-slate-200 dark:border-slate-800">
+                  <div class="font-bold text-slate-800 dark:text-slate-200 mb-2">Mandatory Statutory Documents &amp; Expiry Dates</div>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/50">
+                      <label class="block font-semibold text-slate-700 dark:text-slate-300">Land Lease / Ownership Deed Expiry *</label>
+                      <input id="formLeaseExpiry" type="date" required value="2026-12-05" class="mt-1 w-full px-2.5 py-1 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-mono">
+                    </div>
+                    <div class="p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/50">
+                      <label class="block font-semibold text-slate-700 dark:text-slate-300">Fire Safety Certificate NOC Expiry *</label>
+                      <input id="formFireExpiry" type="date" required value="2027-03-15" class="mt-1 w-full px-2.5 py-1 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-mono">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Undertaking Details -->
+                <div class="pt-2 border-t border-slate-200 dark:border-slate-800 space-y-2">
+                  <div class="font-bold text-slate-800 dark:text-slate-200">Institutional Undertaking &amp; Affidavit Declarations</div>
+                  <label class="flex items-start space-x-2 cursor-pointer">
+                    <input type="checkbox" required checked class="mt-0.5 rounded text-blue-600 focus:ring-blue-500">
+                    <span class="text-slate-600 dark:text-slate-300">We undertake to maintain AICTE prescribed Faculty-to-Student ratio (1:20) and Cadre Ratio (1:2:6) before academic session commencement.</span>
+                  </label>
+                  <label class="flex items-start space-x-2 cursor-pointer">
+                    <input type="checkbox" required checked class="mt-0.5 rounded text-blue-600 focus:ring-blue-500">
+                    <span class="text-slate-600 dark:text-slate-300">All uploaded building blueprints, fire safety NOCs, and land lease deeds are valid and digitally signed.</span>
+                  </label>
+                </div>
+
+                <div class="pt-3 flex items-center justify-end gap-3">
+                  <button type="submit" class="px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-sm transition-all flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                    <span>Submit Application &amp; Route via APH Engine</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Right 5 Cols: Institution Live Application Status Tracker -->
+            <div class="lg:col-span-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm flex flex-col justify-between">
+              <div>
+                <h2 class="text-base font-bold text-slate-900 dark:text-white">Live Application Timeline Tracker</h2>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 mb-4">Select an application below to view its current stage, assigned officer, and pending compliance actions.</p>
+                
+                <div id="portalRecentAppsList" class="space-y-3">
+                  <!-- Populated by JS -->
+                </div>
+              </div>
+
+              <div class="mt-6 p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs space-y-1.5">
+                <div class="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                  <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <span>Transparent Institution Visibility</span>
+                </div>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                  Institutions receive automated SMS/email alerts whenever scrutiny observations are logged or EVC dates are assigned.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================================================
+             VIEW 4: EVC MANAGEMENT (Expert Visit Committee Scheduling & Reports)
+        =========================================================================== -->
+        <section id="view-evc" class="hidden space-y-6">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h1 class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                Expert Visit Committee (EVC) Scheduling &amp; Inspection Hub
+              </h1>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Coordinate EVC inspection dates, assign committee experts, track visit status, and record infrastructure verification reports.
+              </p>
+            </div>
+            <button onclick="openNewEvcScheduleModal()" class="px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <span>+ Schedule New EVC Visit</span>
+            </button>
+          </div>
+
+          <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 uppercase">
+                    <th class="py-3 px-4 font-semibold">EVC ID &amp; App Ref</th>
+                    <th class="py-3 px-4 font-semibold">Institute Name</th>
+                    <th class="py-3 px-3 font-semibold">Region</th>
+                    <th class="py-3 px-3 font-semibold">Visit Date &amp; Mode</th>
+                    <th class="py-3 px-3 font-semibold">Committee Chair &amp; Experts</th>
+                    <th class="py-3 px-3 font-semibold">Status</th>
+                    <th class="py-3 px-3 font-semibold">Inspection Score</th>
+                    <th class="py-3 px-4 text-right font-semibold">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="evcFullTableBody" class="divide-y divide-slate-100 dark:divide-slate-800">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================================================
+             VIEW 5: COMPLIANCE & UNDERTAKING MONITORING
+        =========================================================================== -->
+        <section id="view-compliance" class="hidden space-y-6">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h1 class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                Institutional Compliance &amp; Undertaking Monitoring
+              </h1>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Track time-bound institutional undertakings, conditional approval requirements, and regulatory submissions.
+              </p>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+              <span class="px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-semibold">Compliant: 62%</span>
+              <span class="px-3 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 font-semibold">Pending: 22%</span>
+              <span class="px-3 py-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 font-semibold">Overdue: 16%</span>
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 uppercase">
+                    <th class="py-3 px-4 font-semibold">Undertaking ID</th>
+                    <th class="py-3 px-4 font-semibold">Institution Name</th>
+                    <th class="py-3 px-3 font-semibold">Undertaking / Regulatory Condition</th>
+                    <th class="py-3 px-3 font-semibold">APH Clause</th>
+                    <th class="py-3 px-3 font-semibold">Deadline</th>
+                    <th class="py-3 px-3 font-semibold">Evidence File</th>
+                    <th class="py-3 px-3 font-semibold">Status</th>
+                    <th class="py-3 px-4 text-right font-semibold">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="complianceTableBody" class="divide-y divide-slate-100 dark:divide-slate-800">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================================================
+             VIEW 6: DOCUMENT EXPIRY MONITOR
+        =========================================================================== -->
+        <section id="view-documents" class="hidden space-y-6">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h1 class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                Document Validity &amp; Expiry Alert Monitor
+              </h1>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Proactive tracking of land lease deeds, fire safety certificates, building approvals, and financial FDRs before they expire.
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <select id="docExpiryFilter" onchange="renderDocumentsTable()" class="px-3 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
+                <option value="ALL">All Document Statuses</option>
+                <option value="Overdue">Overdue / Expired Only</option>
+                <option value="Expiring Soon">Expiring Soon (&lt; 45 Days)</option>
+                <option value="Valid">Valid</option>
+              </select>
+              <button onclick="sendBulkExpiryAlerts()" class="px-3.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-sm">
+                Notify All Expiring / Overdue
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 uppercase">
+                    <th class="py-3 px-4 font-semibold">Doc Ref</th>
+                    <th class="py-3 px-4 font-semibold">Institution Name</th>
+                    <th class="py-3 px-3 font-semibold">Statutory Document Type</th>
+                    <th class="py-3 px-3 font-semibold">Expiry Date</th>
+                    <th class="py-3 px-3 font-semibold">Remaining Window</th>
+                    <th class="py-3 px-3 font-semibold">Status</th>
+                    <th class="py-3 px-4 text-right font-semibold">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="documentsTableBody" class="divide-y divide-slate-100 dark:divide-slate-800">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================================================
+             VIEW 7: ALERTS & ESCALATION RULES ENGINE
+        =========================================================================== -->
+        <section id="view-alerts" class="hidden space-y-6">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h1 class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                Automated Reminders, Notification Rules &amp; Escalation Engine
+              </h1>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Configure rule-based triggers for pending stages, EVC report delays, and document expiry notifications (Simulated Email / SMS / In-App).
+              </p>
+            </div>
+            <button onclick="triggerSlaScan()" class="px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm">
+              Run Rule Scan Now
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Left 5 Cols: Configurable Notification & Escalation Rules (Matches Slide 4 Visuals) -->
+            <div class="lg:col-span-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-4">
+              <div class="border-b border-slate-200 dark:border-slate-800 pb-3">
+                <h2 class="text-sm font-bold text-slate-900 dark:text-white">Configurable APH Notification &amp; Validation Rules</h2>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400">Toggle active rules for automated alerts and escalation</p>
+              </div>
+              <div id="notificationRulesList" class="space-y-3">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+
+            <!-- Right 7 Cols: Dispatched Alerts Log (Email / SMS / In-App) -->
+            <div class="lg:col-span-7 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3 mb-4">
+                  <div>
+                    <h2 class="text-sm font-bold text-slate-900 dark:text-white">Dispatched Notification &amp; Escalation Feed</h2>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400">Simulated SMS, Email, and In-App alerts generated by the rules engine</p>
+                  </div>
+                  <span id="alertsCountBadge" class="px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 text-xs font-mono font-bold">6 Dispatched</span>
+                </div>
+
+                <div id="alertsFeedContainer" class="space-y-3 max-h-[460px] overflow-y-auto pr-1">
+                  <!-- Populated by JS -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================================================
+             VIEW 8: REPORTS & COMPLETE DIGITAL AUDIT TRAIL
+        =========================================================================== -->
+        <section id="view-reports" class="hidden space-y-6">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h1 class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                Administrative Reports &amp; Complete Digital Audit Trail
+              </h1>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Every stage transition, document verification, and official remark is recorded with a timestamp and user role for accountability.
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="exportAuditTrailCsv()" class="px-3.5 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-1.5 shadow-sm">
+                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                <span>Export Audit CSV</span>
+              </button>
+              <button onclick="window.print()" class="px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm">
+                Print Summary Report
+              </button>
+            </div>
+          </div>
+
+          <!-- Regional Summary Cards -->
+          <div id="regionalSummaryGrid" class="grid grid-cols-1 sm:grid-cols-5 gap-4">
+            <!-- Populated by JS -->
+          </div>
+
+          <!-- Audit Trail Table -->
+          <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+            <div class="px-5 py-3.5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+              <h2 class="text-sm font-bold text-slate-900 dark:text-white">Immutable Digital Audit Trail Log</h2>
+              <span class="text-[11px] text-slate-500 dark:text-slate-400 font-mono">Human-in-the-Loop Verified Actions</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 uppercase">
+                    <th class="py-2.5 px-4 font-semibold">Timestamp</th>
+                    <th class="py-2.5 px-3 font-semibold">Actor &amp; Role</th>
+                    <th class="py-2.5 px-3 font-semibold">Reference ID</th>
+                    <th class="py-2.5 px-3 font-semibold">Action Recorded</th>
+                    <th class="py-2.5 px-3 font-semibold">Stage / Status Change</th>
+                    <th class="py-2.5 px-4 font-semibold">Official Remarks</th>
+                  </tr>
+                </thead>
+                <tbody id="auditTrailTableBody" class="divide-y divide-slate-100 dark:divide-slate-800">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ============================================================================
+       MODAL 1: APPLICATION 360° SCRUTINY, TIMELINE & HUMAN-IN-THE-LOOP ACTION DESK
+  ============================================================================= -->
+  <div id="appInspectModal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-4xl w-full p-6 shadow-2xl space-y-5 my-8">
+      <div class="flex items-start justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <span id="modalAppId" class="px-2.5 py-0.5 rounded bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 font-mono text-xs font-bold">APP-2026-1041</span>
+            <span id="modalAppRouteBadge" class="px-2.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300 text-xs font-semibold">Scrutiny + EVC</span>
+          </div>
+          <h3 id="modalInstName" class="text-lg font-extrabold text-slate-900 dark:text-white mt-1">ABC Engineering College</h3>
+          <p id="modalInstMeta" class="text-xs text-slate-500 dark:text-slate-400">Permanent ID: 1-330192841 &bull; Western Region &bull; Extension of Approval (EoA)</p>
+        </div>
+        <button onclick="closeAppInspectModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Dynamic APH Route Stepper Timeline -->
+      <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800">
+        <div class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">
+          Applicable APH Stage Progression Timeline
+        </div>
+        <div id="modalTimelineStepper" class="flex flex-wrap items-center justify-between gap-2">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Submitted Documents & Verification -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2.5">
+          <div class="text-xs font-bold text-slate-800 dark:text-slate-200">Submitted Statutory Documents</div>
+          <div id="modalDocsList" class="space-y-2 text-xs">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2.5">
+          <div class="text-xs font-bold text-slate-800 dark:text-slate-200">Current Assignment &amp; Remarks History</div>
+          <div id="modalAppDetailsBox" class="text-xs space-y-1.5 text-slate-600 dark:text-slate-300">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Official Human-in-the-Loop Action Desk -->
+      <div id="modalOfficialActionDesk" class="p-4 rounded-xl bg-blue-50/60 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-blue-950 dark:text-blue-200 flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            <span>Authorised AICTE Official Action Desk (Human-in-the-Loop)</span>
+          </span>
+          <span class="text-[11px] text-slate-500 dark:text-slate-400">All decisions are logged to the Audit Trail</span>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">Official Scrutiny / Committee Observation Remarks *</label>
+          <input id="modalActionRemarks" type="text" placeholder="Enter scrutiny verification notes, deficiency details, or approval remarks..." class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+          <div class="flex flex-wrap gap-2">
+            <button onclick="executeAppStageAction('ADVANCE')" class="px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm">
+              Advance to Next APH Stage &rarr;
+            </button>
+            <button onclick="executeAppStageAction('RESCRUTINY')" class="px-3.5 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold shadow-sm">
+              Flag Defect &rarr; Send to Re-scrutiny
+            </button>
+            <button onclick="executeAppStageAction('EVC')" class="px-3.5 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-sm">
+              Assign / Move to EVC Queue
+            </button>
+            <button onclick="executeAppStageAction('SAC')" class="px-3.5 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold shadow-sm">
+              Refer to SAC / SHC
+            </button>
+          </div>
+          <button onclick="executeAppStageAction('APPROVE')" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm">
+            &#10003; Grant Final Approval (EoA/LoA)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================================
+       MODAL 2: EVC INSPECTION REPORT & SCORING MODAL
+  ============================================================================= -->
+  <div id="evcReportModal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+        <div>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white">EVC Inspection Verification Report</h3>
+          <p id="evcModalSubtitle" class="text-xs text-slate-500 dark:text-slate-400">ABC Engineering College</p>
+        </div>
+        <button onclick="closeEvcReportModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white">&times;</button>
+      </div>
+
+      <form onsubmit="saveEvcReport(event)" class="space-y-3 text-xs">
+        <input type="hidden" id="evcModalId">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Visit Status</label>
+            <select id="evcModalStatus" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white">
+              <option value="Scheduled">Scheduled</option>
+              <option value="Visit Completed">Visit Completed</option>
+              <option value="Report Submitted">Report Submitted</option>
+              <option value="Pending Docs">Pending Docs</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Infrastructure &amp; Lab Score (%)</label>
+            <input id="evcModalScore" type="number" min="40" max="100" required value="91" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-mono">
+          </div>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">EVC Committee Observations &amp; Recommendation *</label>
+          <textarea id="evcModalRemarks" rows="3" required class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white" placeholder="Labs, computing facilities, and barrier-free ramps verified as per APH norms..."></textarea>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeEvcReportModal()" class="px-3.5 py-2 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold">Save EVC Report</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================================
+       MODAL 3: APH ROUTE RULES MATRIX MODAL
+  ============================================================================= -->
+  <div id="aphMatrixModal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+        <div>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white">Configurable APH Approval Route Matrix</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Applications dynamically follow different stage sequences as per AICTE Approval Process Handbook</p>
+        </div>
+        <button onclick="closeAphRouteMatrixModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white text-lg font-bold">&times;</button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <div class="p-3 rounded-lg bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900">
+          <div class="font-bold text-blue-900 dark:text-blue-300">1. Route: Only Scrutiny</div>
+          <div class="text-slate-600 dark:text-slate-300 mt-1">Applicable to: Standard Extension of Approval (EoA) with zero deficiency</div>
+          <div class="font-mono text-[11px] text-blue-700 dark:text-blue-400 mt-1">Stages: Registration &rarr; Scrutiny &rarr; Final Approval</div>
+        </div>
+        <div class="p-3 rounded-lg bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900">
+          <div class="font-bold text-emerald-900 dark:text-emerald-300">2. Route: Scrutiny + EVC</div>
+          <div class="text-slate-600 dark:text-slate-300 mt-1">Applicable to: New Technical Institution (LoA), New Course, or Increase in Intake</div>
+          <div class="font-mono text-[11px] text-emerald-700 dark:text-emerald-400 mt-1">Stages: Registration &rarr; Scrutiny &rarr; Re-scrutiny (if flagged) &rarr; EVC Inspection &rarr; Final Approval</div>
+        </div>
+        <div class="p-3 rounded-lg bg-purple-50/70 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-900">
+          <div class="font-bold text-purple-900 dark:text-purple-300">3. Route: EVC + SAC/SHC</div>
+          <div class="text-slate-600 dark:text-slate-300 mt-1">Applicable to: Appellate cases, Restoration of Intake, or Conditional Compliance Hearing</div>
+          <div class="font-mono text-[11px] text-purple-700 dark:text-purple-400 mt-1">Stages: Registration &rarr; Scrutiny &rarr; EVC Inspection &rarr; SAC/SHC Hearing &rarr; Final Approval</div>
+        </div>
+        <div class="p-3 rounded-lg bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900">
+          <div class="font-bold text-amber-900 dark:text-amber-300">4. Route: Only EVC</div>
+          <div class="text-slate-600 dark:text-slate-300 mt-1">Applicable to: Change of Site / Location or Direct Infrastructure Verification</div>
+          <div class="font-mono text-[11px] text-amber-700 dark:text-amber-400 mt-1">Stages: Registration &rarr; EVC Inspection &rarr; Final Approval</div>
+        </div>
+      </div>
+      <div class="flex justify-end pt-2">
+        <button onclick="closeAphRouteMatrixModal()" class="px-4 py-2 rounded-lg bg-blue-600 text-white text-xs font-semibold">Close Matrix</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================================
+       MODAL 4: RESET DEMO CONFIRMATION MODAL (No native confirm() used)
+  ============================================================================= -->
+  <div id="resetConfirmModal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <h3 class="text-base font-bold text-slate-900 dark:text-white">Reset Prototype Demo Data?</h3>
+      <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+        This will restore all counts (1,292 Total, 312 Scrutiny, 118 Re-scrutiny, 86 EVC, 54 SAC/SHC, 102 Approval, 620 Approved), EVC schedules, and document expiry records to their clean baseline state.
+      </p>
+      <div class="flex justify-end gap-2.5 pt-2">
+        <button onclick="closeResetConfirmModal()" class="px-3.5 py-2 rounded-lg border border-slate-300 dark:border-slate-700 text-xs font-semibold text-slate-600 dark:text-slate-300">Cancel</button>
+        <button onclick="confirmResetDemoData()" class="px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold">Reset Baseline Data</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================================
+       TOAST NOTIFICATION CONTAINER (Replaces native alert())
+  ============================================================================= -->
+  <div id="toastContainer" class="fixed bottom-4 right-4 z-50 space-y-2 max-w-sm w-full pointer-events-none"></div>
+
+  <!-- ============================================================================
+       APPLICATION JAVASCRIPT & STATE ENGINE
+  ============================================================================= -->
+  <script>
+    const STORAGE_KEY = 'AICTE_FLOWTRACK_SIH26262_STATE_V2';
+    const THEME_KEY = 'AICTE_FLOWTRACK_SIH26262_THEME';
+
+    // Reference date for countdown calculations (8 Nov 2026 context)
+    const REF_TODAY = new Date('2026-11-08T00:00:00');
+
+    // APH Route Stage Definitions
+    const APH_ROUTES = {
+      'Only Scrutiny': ['Registration', 'Scrutiny', 'Approval', 'Approved'],
+      'Scrutiny + EVC': ['Registration', 'Scrutiny', 'Re-scrutiny', 'EVC', 'Approval', 'Approved'],
+      'EVC + SAC/SHC': ['Registration', 'Scrutiny', 'EVC', 'SAC/SHC', 'Approval', 'Approved'],
+      'Only EVC': ['Registration', 'EVC', 'Approval', 'Approved']
+    };
+
+    // Default Baseline State (Matches Corrected Final Slide 2 & Slide 3/4/5)
+    function getInitialSeedState() {
+      return {
+        currentView: 'dashboard',
+        currentRole: 'official', // 'official' or 'institution'
+        selectedAppId: 'APP-2026-101',
+        // Reconciled aggregate stage counts (312 + 118 + 86 + 54 + 102 = 672 pending + 620 approved = 1,292 total)
+        metrics: {
+          Scrutiny: 312,
+          'Re-scrutiny': 118,
+          EVC: 86,
+          'SAC/SHC': 54,
+          Approval: 102,
+          Approved: 620
+        },
+        compliancePct: {
+          compliant: 62,
+          pending: 22,
+          overdue: 16
+        },
+        applications: [
+          {
+            id: 'APP-2026-101',
+            instName: 'ABC Engineering College',
+            permId: '1-330192841',
+            region: 'Western',
+            appType: 'New Course / Increase in Intake',
+            route: 'Scrutiny + EVC',
+            stage: 'EVC',
+            officer: 'Dr. R. K. Deshmukh (WRO)',
+            dueDate: '2026-11-12',
+            remarks: 'Scrutiny cleared; EVC physical inspection scheduled for 12 Nov 2026.',
+            docs: [
+              { name: 'Land Lease Agreement', expiry: '2028-06-30', status: 'Valid' },
+              { name: 'Fire Safety Certificate', expiry: '2027-08-15', status: 'Valid' },
+              { name: 'AICTE Undertaking Affidavit', expiry: '2027-05-30', status: 'Valid' }
+            ]
+          },
+          {
+            id: 'APP-2026-102',
+            instName: 'XYZ Institute of Technology',
+            permId: '1-449182731',
+            region: 'Northern',
+            appType: 'New Technical Institution (LoA)',
+            route: 'Scrutiny + EVC',
+            stage: 'EVC',
+            officer: 'Prof. S. Verma (NRO)',
+            dueDate: '2026-11-15',
+            remarks: 'Initial scrutiny completed; EVC committee rostered for 15 Nov 2026.',
+            docs: [
+              { name: 'Building Plan Approval', expiry: '2029-12-31', status: 'Valid' },
+              { name: 'Fire Safety NOC', expiry: '2027-04-10', status: 'Valid' }
+            ]
+          },
+          {
+            id: 'APP-2026-103',
+            instName: 'LMN Polytechnic',
+            permId: '1-219048122',
+            region: 'Southern',
+            appType: 'Appeal / Restoration of Intake',
+            route: 'EVC + SAC/SHC',
+            stage: 'Re-scrutiny',
+            officer: 'Smt. K. Nair (SRO)',
+            dueDate: '2026-11-18',
+            remarks: 'Pending clarification on laboratory equipment invoice & barrier-free ramp photos.',
+            docs: [
+              { name: 'Structural Stability Certificate', expiry: '2026-11-28', status: 'Expiring Soon' },
+              { name: 'Faculty Cadre Undertaking', expiry: '2027-01-15', status: 'Valid' }
+            ]
+          },
+          {
+            id: 'APP-2026-104',
+            instName: 'PQR College of Engineering',
+            permId: '1-558192011',
+            region: 'Western',
+            appType: 'Extension of Approval (EoA)',
+            route: 'Only Scrutiny',
+            stage: 'Scrutiny',
+            officer: 'Shri A. Kulkarni (WRO)',
+            dueDate: '2026-11-30',
+            remarks: 'Under regional scrutiny verification; lease renewal due in 22 days.',
+            docs: [
+              { name: 'Lease Agreement', expiry: '2026-11-30', status: 'Expiring Soon' },
+              { name: 'Fire Safety Certificate', expiry: '2027-09-01', status: 'Valid' }
+            ]
+          },
+          {
+            id: 'APP-2026-105',
+            instName: 'STU Institute of Management & Tech',
+            permId: '1-662019283',
+            region: 'Eastern',
+            appType: 'Change of Site / Infrastructure Verification',
+            route: 'Only EVC',
+            stage: 'SAC/SHC',
+            officer: 'Dr. P. Chatterjee (ERO)',
+            dueDate: '2026-12-10',
+            remarks: 'Building Plan expiry flagged; referred to Standing Hearing Committee.',
+            docs: [
+              { name: 'Building Plan', expiry: '2026-12-15', status: 'Expiring Soon' }
+            ]
+          },
+          {
+            id: 'APP-2026-106',
+            instName: 'VWX College of Pharmacy & Tech',
+            permId: '1-778192044',
+            region: 'Central',
+            appType: 'Extension of Approval (EoA)',
+            route: 'Scrutiny + EVC',
+            stage: 'Re-scrutiny',
+            officer: 'Dr. M. Tiwari (CRO)',
+            dueDate: '2026-11-10',
+            remarks: 'URGENT: Fire Safety Certificate expired on 05 Sep 2026. Renewal upload required.',
+            docs: [
+              { name: 'Fire Safety Certificate', expiry: '2026-09-05', status: 'Overdue' }
+            ]
+          },
+          {
+            id: 'APP-2026-107',
+            instName: 'National Institute of Advanced Computing',
+            permId: '1-889120394',
+            region: 'Northern',
+            appType: 'Extension of Approval (EoA)',
+            route: 'Only Scrutiny',
+            stage: 'Approval',
+            officer: 'AICTE HQ Approval Bureau',
+            dueDate: '2026-11-20',
+            remarks: 'All scrutiny checks and affidavits verified. Queued for final EoA issuance.',
+            docs: [
+              { name: 'Consolidated EoA Affidavit', expiry: '2027-06-30', status: 'Valid' }
+            ]
+          },
+          {
+            id: 'APP-2026-108',
+            instName: 'Deccan Institute of Engineering',
+            permId: '1-991029381',
+            region: 'Southern',
+            appType: 'Extension of Approval (EoA)',
+            route: 'Only Scrutiny',
+            stage: 'Approved',
+            officer: 'AICTE Council Secretariat',
+            dueDate: '2026-10-28',
+            remarks: 'Extension of Approval (EoA) 2026-27 digitally signed and issued.',
+            docs: [
+              { name: 'Land Ownership Deed', expiry: '2035-12-31', status: 'Valid' }
+            ]
+          }
+        ],
+        evcSchedules: [
+          {
+            evcId: 'EVC-2026-01',
+            appId: 'APP-2026-101',
+            date: '12 Nov 2026',
+            instName: 'ABC Engineering College',
+            region: 'Western',
+            mode: 'Physical Inspection',
+            chair: 'Prof. V. K. Saraswat + 2 Experts',
+            status: 'Scheduled',
+            score: 92,
+            remarks: 'Committee rostered; travel itinerary confirmed with Western Regional Office.'
+          },
+          {
+            evcId: 'EVC-2026-02',
+            appId: 'APP-2026-102',
+            date: '15 Nov 2026',
+            instName: 'XYZ Institute of Technology',
+            region: 'Northern',
+            mode: 'Online EVC (Video)',
+            chair: 'Dr. A. K. Singh + 2 Experts',
+            status: 'Scheduled',
+            score: 88,
+            remarks: 'Geo-tagged live laboratory walkthrough scheduled.'
+          },
+          {
+            evcId: 'EVC-2026-03',
+            appId: 'APP-2026-103',
+            date: '18 Nov 2026',
+            instName: 'LMN Polytechnic',
+            region: 'Southern',
+            mode: 'Physical Inspection',
+            chair: 'Dr. S. Subramanian + 2 Experts',
+            status: 'Pending Docs',
+            score: 76,
+            remarks: 'Awaiting pre-visit equipment invoice upload from institution.'
+          },
+          {
+            evcId: 'EVC-2026-04',
+            appId: 'APP-2026-105',
+            date: '24 Nov 2026',
+            instName: 'STU Institute of Management & Tech',
+            region: 'Eastern',
+            mode: 'Physical Inspection',
+            chair: 'Prof. D. Sengupta + 2 Experts',
+            status: 'Report Submitted',
+            score: 94,
+            remarks: 'Inspection completed; positive recommendation uploaded to portal.'
+          }
+        ],
+        documents: [
+          {
+            docId: 'DOC-901',
+            instName: 'PQR College',
+            docType: 'Lease Agreement',
+            expiryDate: '2026-11-30',
+            displayDate: '30 Nov 2026',
+            status: 'Expiring Soon'
+          },
+          {
+            docId: 'DOC-902',
+            instName: 'STU Institute',
+            docType: 'Building Plan',
+            expiryDate: '2026-12-15',
+            displayDate: '15 Dec 2026',
+            status: 'Expiring Soon'
+          },
+          {
+            docId: 'DOC-903',
+            instName: 'VWX College',
+            docType: 'Fire Safety Certificate',
+            expiryDate: '2026-09-05',
+            displayDate: '05 Sep 2026',
+            status: 'Overdue'
+          },
+          {
+            docId: 'DOC-904',
+            instName: 'LMN Polytechnic',
+            docType: 'Structural Stability NOC',
+            expiryDate: '2026-11-28',
+            displayDate: '28 Nov 2026',
+            status: 'Expiring Soon'
+          },
+          {
+            docId: 'DOC-905',
+            instName: 'Kaveri Technical Campus',
+            docType: 'Joint FDR Deposit',
+            expiryDate: '2026-10-15',
+            displayDate: '15 Oct 2026',
+            status: 'Overdue'
+          },
+          {
+            docId: 'DOC-906',
+            instName: 'ABC Engineering College',
+            docType: 'Land Lease Agreement',
+            expiryDate: '2028-06-30',
+            displayDate: '30 Jun 2028',
+            status: 'Valid'
+          }
+        ],
+        undertakings: [
+          {
+            id: 'UND-2026-01',
+            instName: 'ABC Engineering College',
+            condition: 'Maintain 1:20 Faculty-Student Ratio & 7th CPC Pay Scale',
+            clause: 'APH Chapter VII Cl. 7.4',
+            deadline: '30 Nov 2026',
+            evidence: 'Faculty_Roster_Affidavit.pdf',
+            status: 'Compliant'
+          },
+          {
+            id: 'UND-2026-02',
+            instName: 'PQR College of Engineering',
+            condition: 'Registered Land Lease Deed Renewal for 30 Years',
+            clause: 'APH Chapter II Cl. 2.6',
+            deadline: '30 Nov 2026',
+            evidence: 'Pending Upload',
+            status: 'Pending'
+          },
+          {
+            id: 'UND-2026-03',
+            instName: 'VWX College of Pharmacy & Tech',
+            condition: 'Valid Fire Safety Certificate from State Fire Authority',
+            clause: 'APH Appendix 17',
+            deadline: '05 Sep 2026',
+            evidence: 'Expired_NOC_2026.pdf',
+            status: 'Overdue'
+          },
+          {
+            id: 'UND-2026-04',
+            instName: 'LMN Polytechnic',
+            condition: 'Barrier-Free Environment & Lift Facility Compliance',
+            clause: 'APH Chapter VI',
+            deadline: '25 Nov 2026',
+            evidence: 'Ramp_GeoTagged_Photos.pdf',
+            status: 'Pending'
+          },
+          {
+            id: 'UND-2026-05',
+            instName: 'XYZ Institute of Technology',
+            condition: 'AICTE Corpus Fund Joint FDR Creation',
+            clause: 'APH Chapter III Cl. 3.9',
+            deadline: '15 Dec 2026',
+            evidence: 'FDR_Receipt_SBI.pdf',
+            status: 'Compliant'
+          }
+        ],
+        notificationRules: [
+          { id: 'RULE-1', name: 'Document Expiry Early Warning (< 30 Days)', desc: 'Send automated SMS/Email reminder to Institution & Regional Officer 30 days prior to lease/NOC expiry.', enabled: true },
+          { id: 'RULE-2', name: 'Overdue Document & Undertaking Escalation', desc: 'Escalate expired statutory documents (e.g., Fire Safety Certificate) to Approval Bureau.', enabled: true },
+          { id: 'RULE-3', name: 'EVC Report Submission SLA (> 48 Hours)', desc: 'Notify EVC Chair if inspection report is not uploaded within 48 hours of visit completion.', enabled: true },
+          { id: 'RULE-4', name: 'Missing Credentials / Incomplete Affidavit Check', desc: 'Flag applications missing mandatory digital signature or undertaking fields during intake.', enabled: true },
+          { id: 'RULE-5', name: 'Role Mismatch & Duplicate Application Guard', desc: 'Enforce role-based access and flag duplicate Permanent ID submissions in same APH cycle.', enabled: true }
+        ],
+        alertsFeed: [
+          {
+            id: 'ALT-101',
+            time: '08 Nov 2026, 09:45 AM',
+            channel: 'SMS + Email',
+            severity: 'Overdue',
+            target: 'VWX College & Central RO',
+            message: 'CRITICAL: Fire Safety Certificate expired on 05 Sep 2026. Escalated to Re-scrutiny desk.'
+          },
+          {
+            id: 'ALT-102',
+            time: '08 Nov 2026, 09:30 AM',
+            channel: 'In-App + Email',
+            severity: 'Expiring Soon',
+            target: 'PQR College',
+            message: 'REMINDER: Lease Agreement expires on 30 Nov 2026 (22 days remaining). Upload renewal deed.'
+          },
+          {
+            id: 'ALT-103',
+            time: '08 Nov 2026, 09:15 AM',
+            channel: 'Email',
+            severity: 'Expiring Soon',
+            target: 'STU Institute',
+            message: 'REMINDER: Building Plan approval approaches expiry on 15 Dec 2026.'
+          },
+          {
+            id: 'ALT-104',
+            time: '07 Nov 2026, 04:20 PM',
+            channel: 'In-App + SMS',
+            severity: 'EVC Alert',
+            target: 'LMN Polytechnic & EVC Chair',
+            message: 'ACTION REQUIRED: Pre-visit laboratory documents pending for 18 Nov 2026 EVC inspection.'
+          },
+          {
+            id: 'ALT-105',
+            time: '07 Nov 2026, 02:10 PM',
+            channel: 'In-App',
+            severity: 'Info',
+            target: 'ABC Engineering College',
+            message: 'EVC SCHEDULED: Expert Visit Committee inspection confirmed for 12 Nov 2026 (Western Region).'
+          },
+          {
+            id: 'ALT-106',
+            time: '06 Nov 2026, 11:05 AM',
+            channel: 'SMS + Email',
+            severity: 'Overdue',
+            target: 'Kaveri Technical Campus',
+            message: 'OVERDUE: Joint FDR Deposit matured on 15 Oct 2026. Renewal receipt pending.'
+          }
+        ],
+        auditTrail: [
+          {
+            time: '08 Nov 2026, 10:05 AM',
+            actor: 'Dr. R. K. Deshmukh (Regional Officer - WRO)',
+            refId: 'APP-2026-101',
+            action: 'Scheduled EVC Inspection',
+            transition: 'Scrutiny → EVC',
+            remarks: 'All land and faculty documents verified under APH norms. Assigned EVC visit for 12 Nov 2026.'
+          },
+          {
+            time: '08 Nov 2026, 09:45 AM',
+            actor: 'System Rule Engine (Automated Alert)',
+            refId: 'DOC-903 / VWX College',
+            action: 'Expiry Escalation Triggered',
+            transition: 'Status: Overdue',
+            remarks: 'Fire Safety Certificate expired on 05 Sep 2026; automated notice dispatched.'
+          },
+          {
+            time: '07 Nov 2026, 05:12 PM',
+            actor: 'Smt. K. Nair (Scrutiny Officer - SRO)',
+            refId: 'APP-2026-103',
+            action: 'Flagged Deficiency',
+            transition: 'Scrutiny → Re-scrutiny',
+            remarks: 'Requested clearer geo-tagged photographs of barrier-free ramp and lab invoices.'
+          },
+          {
+            time: '06 Nov 2026, 03:40 PM',
+            actor: 'AICTE Council Secretariat',
+            refId: 'APP-2026-108',
+            action: 'Granted Extension of Approval (EoA)',
+            transition: 'Approval → Approved',
+            remarks: 'Final EoA letter issued for Academic Session 2026-27.'
+          }
+        ]
+      };
+    }
+
+    let appState = loadState();
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          return JSON.parse(raw);
+        }
+      } catch (e) {
+        console.warn('localStorage load fallback:', e);
+      }
+      return getInitialSeedState();
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+      } catch (e) {
+        console.warn('localStorage save error:', e);
+      }
+    }
+
+    // ============================================================================
+    // LIGHT / DARK THEME MANAGEMENT
+    // ============================================================================
+    function initTheme() {
+      const savedTheme = localStorage.getItem(THEME_KEY) || 'light';
+      applyTheme(savedTheme);
+    }
+
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.contains('dark');
+      applyTheme(isDark ? 'light' : 'dark');
+    }
+
+    function applyTheme(mode) {
+      const root = document.documentElement;
+      const iconSun = document.getElementById('iconSun');
+      const iconMoon = document.getElementById('iconMoon');
+      const label = document.getElementById('themeToggleLabel');
+
+      if (mode === 'dark') {
+        root.classList.add('dark');
+        root.classList.remove('light');
+        iconSun.classList.remove('hidden');
+        iconMoon.classList.add('hidden');
+        label.textContent = 'Light Mode';
+      } else {
+        root.classList.remove('dark');
+        root.classList.add('light');
+        iconSun.classList.add('hidden');
+        iconMoon.classList.remove('hidden');
+        label.textContent = 'Dark Mode';
+      }
+      try {
+        localStorage.setItem(THEME_KEY, mode);
+      } catch (e) {}
+    }
+
+    // ============================================================================
+    // TOAST NOTIFICATION HELPER
+    // ============================================================================
+    function showToast(title, message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const colors = {
+        info: 'bg-slate-900 border-blue-500 text-white',
+        success: 'bg-emerald-950 border-emerald-500 text-emerald-50',
+        warning: 'bg-amber-950 border-amber-500 text-amber-50',
+        danger: 'bg-rose-950 border-rose-500 text-rose-50'
+      };
+      const toast = document.createElement('div');
+      toast.className = `pointer-events-auto p-3.5 rounded-xl border-l-4 shadow-xl ${colors[type] || colors.info} transition-all duration-300 flex items-start justify-between gap-3 text-xs`;
+      toast.innerHTML = `
+        <div>
+          <div class="font-bold">${title}</div>
+          <div class="text-[11px] opacity-90 mt-0.5">${message}</div>
+        </div>
+        <button onclick="this.parentElement.remove()" class="opacity-70 hover:opacity-100 font-bold text-sm">&times;</button>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => {
+        if (toast && toast.parentElement) toast.remove();
+      }, 4500);
+    }
+
+    // ============================================================================
+    // NAVIGATION & ROLE SWITCHING
+    // ============================================================================
+    function navigate(viewId) {
+      appState.currentView = viewId;
+      saveState();
+
+      const views = ['dashboard', 'applications', 'portal', 'evc', 'compliance', 'documents', 'alerts', 'reports'];
+      views.forEach(v => {
+        const el = document.getElementById(`view-${v}`);
+        const btn = document.getElementById(`nav-${v}`);
+        if (el) {
+          if (v === viewId) el.classList.remove('hidden');
+          else el.classList.add('hidden');
+        }
+        if (btn) {
+          if (v === viewId) {
+            btn.className = 'nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold transition-all bg-blue-600 text-white shadow-sm';
+          } else {
+            btn.className = 'nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition-all';
+          }
+        }
+      });
+
+      renderAll();
+    }
+
+    function switchUserRole(role) {
+      appState.currentRole = role;
+      saveState();
+
+      const btnOff = document.getElementById('roleBtnOfficial');
+      const btnInst = document.getElementById('roleBtnInstitution');
+      const sideLabel = document.getElementById('sidebarRoleLabel');
+      const sideSub = document.getElementById('sidebarRoleSub');
+
+      if (role === 'official') {
+        btnOff.className = 'px-2.5 py-1 rounded-md text-xs font-semibold transition-all bg-blue-600 text-white shadow-sm flex items-center gap-1.5';
+        btnInst.className = 'px-2.5 py-1 rounded-md text-xs font-semibold transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white flex items-center gap-1.5';
+        sideLabel.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>AICTE Official (Scrutiny/EVC)</span>';
+        sideSub.textContent = 'Regional / Bureau / Committees';
+        showToast('Role Switched: AICTE Official', 'Full access to scrutiny actions, EVC scheduling, and approval authority enabled.', 'info');
+      } else {
+        btnInst.className = 'px-2.5 py-1 rounded-md text-xs font-semibold transition-all bg-emerald-600 text-white shadow-sm flex items-center gap-1.5';
+        btnOff.className = 'px-2.5 py-1 rounded-md text-xs font-semibold transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white flex items-center gap-1.5';
+        sideLabel.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400"></span><span>Institution Portal User</span>';
+        sideSub.textContent = 'College / Technical Institution View';
+        navigate('portal');
+        showToast('Role Switched: Institution Portal', 'Switched to College Portal view for submitting applications and uploading compliance documents.', 'success');
+      }
+      renderAll();
+    }
+
+    function handleGlobalSearch(query) {
+      const q = query.trim();
+      if (q.length > 0) {
+        document.getElementById('appFilterSearch').value = q;
+        if (appState.currentView !== 'applications') {
+          navigate('applications');
+        } else {
+          renderApplicationsTable();
+        }
+      }
+    }
+
+    // ============================================================================
+    // RENDER DASHBOARD &KPIs
+    // ============================================================================
+    function getTotals() {
+      const m = appState.metrics;
+      const pending = m.Scrutiny + m['Re-scrutiny'] + m.EVC + m['SAC/SHC'] + m.Approval;
+      const total = pending + m.Approved;
+      return { pending, total };
+    }
+
+    function renderDashboard() {
+      const m = appState.metrics;
+      const { pending, total } = getTotals();
+
+      // KPIs
+      document.getElementById('kpi-total').textContent = total.toLocaleString();
+      document.getElementById('kpi-scrutiny').textContent = m.Scrutiny.toLocaleString();
+      document.getElementById('kpi-evc').textContent = m.EVC.toLocaleString();
+      document.getElementById('kpi-approved').textContent = m.Approved.toLocaleString();
+
+      // Sidebar badges
+      document.getElementById('nav-badge-total').textContent = total.toLocaleString();
+      document.getElementById('nav-badge-pending').textContent = pending.toLocaleString();
+      document.getElementById('nav-badge-evc').textContent = m.EVC.toLocaleString();
+      document.getElementById('chartTotalActive').textContent = pending.toLocaleString();
+      document.getElementById('donutCenterTotal').textContent = total.toLocaleString();
+      document.getElementById('headerBellCount').textContent = appState.alertsFeed.length;
+
+      // Stage-wise Pendency Bars (Matching Slide 2 colors & order)
+      const stagesConfig = [
+        { key: 'Scrutiny', label: 'Scrutiny', count: m.Scrutiny, color: 'bg-blue-600' },
+        { key: 'Re-scrutiny', label: 'Re-scrutiny', count: m['Re-scrutiny'], color: 'bg-orange-500' },
+        { key: 'EVC', label: 'EVC', count: m.EVC, color: 'bg-rose-500' },
+        { key: 'SAC/SHC', label: 'SAC/SHC', count: m['SAC/SHC'], color: 'bg-purple-600' },
+        { key: 'Approval', label: 'Approval', count: m.Approval, color: 'bg-emerald-600' }
+      ];
+      const maxStage = Math.max(...stagesConfig.map(s => s.count), 1);
+      const barsContainer = document.getElementById('stageBarsContainer');
+      barsContainer.innerHTML = stagesConfig.map(s => {
+        const widthPct = Math.round((s.count / maxStage) * 100);
+        return `
+          <div onclick="filterApplicationsByStage('${s.key}')" class="cursor-pointer group">
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="font-semibold text-slate-700 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">${s.label}</span>
+              <span class="font-mono font-bold text-slate-900 dark:text-white">${s.count}</span>
+            </div>
+            <div class="w-full h-3 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+              <div class="h-full rounded-full ${s.color} bar-fill" style="width: ${widthPct}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Dashboard Upcoming EVC Schedule Table
+      const evcBody = document.getElementById('dashboardEvcTableBody');
+      evcBody.innerHTML = appState.evcSchedules.slice(0, 4).map(item => `
+        <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
+          <td class="py-2.5 pr-3 font-mono font-semibold text-slate-800 dark:text-slate-200 whitespace-nowrap">${item.date}</td>
+          <td class="py-2.5 px-3 font-semibold text-slate-900 dark:text-white">${item.instName}</td>
+          <td class="py-2.5 px-3 text-slate-600 dark:text-slate-300">${item.region}</td>
+          <td class="py-2.5 px-3">${getEvcStatusBadge(item.status)}</td>
+          <td class="py-2.5 pl-3 text-right">
+            <button onclick="openEvcReportModal('${item.evcId}')" class="text-blue-600 dark:text-blue-400 font-semibold hover:underline">Update</button>
+          </td>
+        </tr>
+      `).join('');
+
+      // Dashboard Document Expiry Alerts Table
+      const expBody = document.getElementById('dashboardExpiryTableBody');
+      expBody.innerHTML = appState.documents.slice(0, 4).map(doc => `
+        <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
+          <td class="py-2.5 pr-3 font-semibold text-slate-900 dark:text-white">${doc.instName}</td>
+          <td class="py-2.5 px-3 text-slate-600 dark:text-slate-300">${doc.docType}</td>
+          <td class="py-2.5 px-3 font-mono text-slate-700 dark:text-slate-300 whitespace-nowrap">${doc.displayDate}</td>
+          <td class="py-2.5 px-3">${getDocStatusBadge(doc.status)}</td>
+          <td class="py-2.5 pl-3 text-right">
+            <button onclick="sendSingleExpiryReminder('${doc.docId}')" class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-950 text-blue-600 dark:text-blue-400 font-semibold text-[11px]">
+              Send Alert
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function getEvcStatusBadge(status) {
+      if (status === 'Scheduled') {
+        return `<span class="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 font-semibold text-[11px]">Scheduled</span>`;
+      }
+      if (status === 'Pending Docs') {
+        return `<span class="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 font-semibold text-[11px]">Pending Docs</span>`;
+      }
+      return `<span class="px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/80 text-blue-800 dark:text-blue-300 font-semibold text-[11px]">${status}</span>`;
+    }
+
+    function getDocStatusBadge(status) {
+      if (status === 'Overdue') {
+        return `<span class="px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-800 font-bold text-[11px] pulse-badge">Overdue</span>`;
+      }
+      if (status === 'Expiring Soon') {
+        return `<span class="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800 font-semibold text-[11px]">Expiring Soon</span>`;
+      }
+      return `<span class="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-semibold text-[11px]">Valid</span>`;
+    }
+
+    function getStageBadge(stage) {
+      const map = {
+        'Scrutiny': 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+        'Re-scrutiny': 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border-amber-200 dark:border-amber-800',
+        'EVC': 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 border-rose-200 dark:border-rose-800',
+        'SAC/SHC': 'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300 border-purple-200 dark:border-purple-800',
+        'Approval': 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800',
+        'Approved': 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+      };
+      return `<span class="px-2.5 py-0.5 rounded-full border text-[11px] font-semibold ${map[stage] || map.Scrutiny}">${stage}</span>`;
+    }
+
+    // ============================================================================
+    // VIEW 2: APPLICATIONS & APH ROUTING TABLE + 360 MODAL
+    // ============================================================================
+    function filterApplicationsByStage(stage) {
+      document.getElementById('appFilterStage').value = stage;
+      navigate('applications');
+    }
+
+    function resetAppFilters() {
+      document.getElementById('appFilterSearch').value = '';
+      document.getElementById('appFilterStage').value = 'ALL';
+      document.getElementById('appFilterRoute').value = 'ALL';
+      document.getElementById('appFilterRegion').value = 'ALL';
+      document.getElementById('globalSearchInput').value = '';
+      renderApplicationsTable();
+    }
+
+    function renderApplicationsTable() {
+      const q = (document.getElementById('appFilterSearch').value || '').toLowerCase();
+      const stageFilter = document.getElementById('appFilterStage').value;
+      const routeFilter = document.getElementById('appFilterRoute').value;
+      const regionFilter = document.getElementById('appFilterRegion').value;
+
+      const filtered = appState.applications.filter(app => {
+        const matchQ = !q || app.id.toLowerCase().includes(q) || app.instName.toLowerCase().includes(q) || app.permId.toLowerCase().includes(q) || app.route.toLowerCase().includes(q);
+        const matchStage = stageFilter === 'ALL' || app.stage === stageFilter;
+        const matchRoute = routeFilter === 'ALL' || app.route === routeFilter;
+        const matchRegion = regionFilter === 'ALL' || app.region === regionFilter;
+        return matchQ && matchStage && matchRoute && matchRegion;
+      });
+
+      const tbody = document.getElementById('applicationsTableBody');
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="py-8 text-center text-slate-400">No matching applications found for the selected APH filter criteria.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(app => `
+        <tr class="hover:bg-slate-50/90 dark:hover:bg-slate-800/50 transition-colors">
+          <td class="py-3 px-4 font-mono font-bold text-blue-600 dark:text-blue-400">${app.id}</td>
+          <td class="py-3 px-4">
+            <div class="font-bold text-slate-900 dark:text-white">${app.instName}</div>
+            <div class="text-[11px] font-mono text-slate-400">PID: ${app.permId}</div>
+          </td>
+          <td class="py-3 px-3 text-slate-600 dark:text-slate-300">${app.region}</td>
+          <td class="py-3 px-3 text-slate-700 dark:text-slate-300 font-medium">${app.appType}</td>
+          <td class="py-3 px-3">
+            <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono text-[11px] border border-slate-200 dark:border-slate-700">${app.route}</span>
+          </td>
+          <td class="py-3 px-3">${getStageBadge(app.stage)}</td>
+          <td class="py-3 px-3 text-slate-600 dark:text-slate-300">${app.officer}</td>
+          <td class="py-3 px-3 font-mono text-slate-600 dark:text-slate-300">${app.dueDate}</td>
+          <td class="py-3 px-4 text-right">
+            <button onclick="openAppInspectModal('${app.id}')" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-xs">
+              Inspect / Process
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openAppInspectModal(appId) {
+      const app = appState.applications.find(a => a.id === appId);
+      if (!app) return;
+      appState.selectedAppId = appId;
+
+      document.getElementById('modalAppId').textContent = app.id;
+      document.getElementById('modalAppRouteBadge').textContent = `APH Route: ${app.route}`;
+      document.getElementById('modalInstName').textContent = app.instName;
+      document.getElementById('modalInstMeta').textContent = `Permanent ID: ${app.permId} • ${app.region} Region • ${app.appType}`;
+      document.getElementById('modalActionRemarks').value = '';
+
+      // Build APH Route Stepper
+      const routeSteps = APH_ROUTES[app.route] || APH_ROUTES['Scrutiny + EVC'];
+      const currentIdx = routeSteps.indexOf(app.stage);
+      const stepperEl = document.getElementById('modalTimelineStepper');
+      stepperEl.innerHTML = routeSteps.map((step, idx) => {
+        let style = 'bg-slate-200 dark:bg-slate-800 text-slate-500';
+        let icon = idx + 1;
+        if (idx < currentIdx || app.stage === 'Approved') {
+          style = 'bg-emerald-600 text-white';
+          icon = '✓';
+        } else if (idx === currentIdx) {
+          style = 'bg-blue-600 text-white ring-4 ring-blue-500/20';
+        }
+        return `
+          <div class="flex items-center space-x-2">
+            <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${style}">${icon}</div>
+            <span class="text-xs font-semibold ${idx === currentIdx ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-slate-600 dark:text-slate-300'}">${step}</span>
+            ${idx < routeSteps.length - 1 ? '<span class="text-slate-300 dark:text-slate-600 px-1">&rarr;</span>' : ''}
+          </div>
+        `;
+      }).join('');
+
+      // Documents List
+      const docsEl = document.getElementById('modalDocsList');
+      docsEl.innerHTML = (app.docs || []).map(d => `
+        <div class="flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+          <div>
+            <div class="font-semibold text-slate-800 dark:text-slate-200">${d.name}</div>
+            <div class="text-[10px] font-mono text-slate-400">Expiry: ${d.expiry}</div>
+          </div>
+          ${getDocStatusBadge(d.status)}
+        </div>
+      `).join('');
+
+      // Details Box
+      document.getElementById('modalAppDetailsBox').innerHTML = `
+        <div><span class="font-semibold text-slate-800 dark:text-slate-200">Current Stage:</span> ${app.stage}</div>
+        <div><span class="font-semibold text-slate-800 dark:text-slate-200">Assigned Officer:</span> ${app.officer}</div>
+        <div><span class="font-semibold text-slate-800 dark:text-slate-200">Target SLA Date:</span> <span class="font-mono">${app.dueDate}</span></div>
+        <div class="p-2.5 rounded-lg bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 text-slate-700 dark:text-slate-200 mt-2">
+          <div class="text-[10px] font-bold uppercase text-amber-800 dark:text-amber-300">Latest Official Observation</div>
+          <div class="mt-0.5">${app.remarks}</div>
+        </div>
+      `;
+
+      document.getElementById('appInspectModal').classList.remove('hidden');
+    }
+
+    function closeAppInspectModal() {
+      document.getElementById('appInspectModal').classList.add('hidden');
+    }
+
+    function executeAppStageAction(actionType) {
+      const app = appState.applications.find(a => a.id === appState.selectedAppId);
+      if (!app) return;
+
+      const remarksInput = document.getElementById('modalActionRemarks').value.trim();
+      const remarks = remarksInput || 'Verified and processed in accordance with AICTE APH 2024–27 norms.';
+      const oldStage = app.stage;
+      let newStage = oldStage;
+
+      const routeSteps = APH_ROUTES[app.route] || APH_ROUTES['Scrutiny + EVC'];
+      const idx = routeSteps.indexOf(oldStage);
+
+      if (actionType === 'ADVANCE') {
+        newStage = idx >= 0 && idx < routeSteps.length - 1 ? routeSteps[idx + 1] : 'Approved';
+      } else if (actionType === 'RESCRUTINY') {
+        newStage = 'Re-scrutiny';
+      } else if (actionType === 'EVC') {
+        newStage = 'EVC';
+      } else if (actionType === 'SAC') {
+        newStage = 'SAC/SHC';
+      } else if (actionType === 'APPROVE') {
+        newStage = 'Approved';
+      }
+
+      if (oldStage !== newStage) {
+        if (appState.metrics[oldStage] !== undefined && appState.metrics[oldStage] > 0) {
+          appState.metrics[oldStage]--;
+        }
+        if (appState.metrics[newStage] !== undefined) {
+          appState.metrics[newStage]++;
+        }
+      }
+
+      app.stage = newStage;
+      app.remarks = remarks;
+
+      // Record in Digital Audit Trail
+      appState.auditTrail.unshift({
+        time: '08 Nov 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        actor: appState.currentRole === 'official' ? 'Authorised AICTE Official (Scrutiny/Bureau)' : 'Institution Representative',
+        refId: app.id,
+        action: `Stage Updated (${actionType})`,
+        transition: `${oldStage} → ${newStage}`,
+        remarks: remarks
+      });
+
+      // Add notification
+      appState.alertsFeed.unshift({
+        id: 'ALT-' + Math.floor(100 + Math.random() * 899),
+        time: 'Just now',
+        channel: 'In-App + Email',
+        severity: newStage === 'Re-scrutiny' ? 'Overdue' : 'Info',
+        target: app.instName,
+        message: `Application ${app.id} moved from ${oldStage} to ${newStage}. Remarks: ${remarks}`
+      });
+
+      saveState();
+      openAppInspectModal(app.id);
+      renderAll();
+      showToast(`Application ${app.id} Updated`, `Transitioned ${oldStage} → ${newStage} and logged in Audit Trail.`, 'success');
+    }
+
+    // ============================================================================
+    // VIEW 3: INSTITUTION PORTAL SUBMISSION & TRACKING
+    // ============================================================================
+    function updateFormRoutePreview() {
+      const type = document.getElementById('formAppType').value;
+      let route = 'Scrutiny + EVC';
+      if (type.includes('Extension of Approval')) route = 'Only Scrutiny';
+      else if (type.includes('Appeal')) route = 'EVC + SAC/SHC';
+      else if (type.includes('Change of Site')) route = 'Only EVC';
+
+      const steps = APH_ROUTES[route].map((s, i) => `${i + 1}. ${s}`).join(' → ');
+      document.getElementById('formRouteBadge').textContent = route;
+      document.getElementById('formRouteStepsPreview').textContent = steps;
+    }
+
+    function submitNewApplication(e) {
+      e.preventDefault();
+      const instName = document.getElementById('formInstName').value.trim();
+      const permId = document.getElementById('formPermId').value.trim();
+      const region = document.getElementById('formRegion').value;
+      const appType = document.getElementById('formAppType').value;
+      const leaseExpiry = document.getElementById('formLeaseExpiry').value;
+      const fireExpiry = document.getElementById('formFireExpiry').value;
+
+      let route = 'Scrutiny + EVC';
+      let initialStage = 'Scrutiny';
+      if (appType.includes('Extension of Approval')) {
+        route = 'Only Scrutiny';
+        initialStage = 'Scrutiny';
+      } else if (appType.includes('Appeal')) {
+        route = 'EVC + SAC/SHC';
+        initialStage = 'Scrutiny';
+      } else if (appType.includes('Change of Site')) {
+        route = 'Only EVC';
+        initialStage = 'EVC';
+      }
+
+      const newId = 'APP-2026-' + (109 + appState.applications.length);
+      const newApp = {
+        id: newId,
+        instName,
+        permId,
+        region,
+        appType,
+        route,
+        stage: initialStage,
+        officer: `${region} Regional Scrutiny Cell`,
+        dueDate: '2026-12-05',
+        remarks: `Application registered via Institution Portal. Routed to ${initialStage} as per APH (${route}).`,
+        docs: [
+          { name: 'Land Lease Deed', expiry: leaseExpiry, status: 'Expiring Soon' },
+          { name: 'Fire Safety Certificate', expiry: fireExpiry, status: 'Valid' }
+        ]
+      };
+
+      appState.applications.unshift(newApp);
+      appState.metrics[initialStage] = (appState.metrics[initialStage] || 0) + 1;
+
+      appState.auditTrail.unshift({
+        time: '08 Nov 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        actor: `Institution Portal (${instName})`,
+        refId: newId,
+        action: 'New Application Submitted',
+        transition: `Registration → ${initialStage}`,
+        remarks: `Auto-routed under APH route "${route}". Mandatory undertakings signed.`
+      });
+
+      saveState();
+      renderAll();
+      showToast('Application Submitted Successfully!', `${newId} assigned APH route "${route}" and routed to ${initialStage}.`, 'success');
+    }
+
+    function renderPortalTracker() {
+      const listEl = document.getElementById('portalRecentAppsList');
+      listEl.innerHTML = appState.applications.slice(0, 5).map(app => {
+        const steps = APH_ROUTES[app.route] || APH_ROUTES['Scrutiny + EVC'];
+        const pct = Math.round(((steps.indexOf(app.stage) + 1) / steps.length) * 100);
+        return `
+          <div onclick="openAppInspectModal('${app.id}')" class="cursor-pointer p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-600 bg-slate-50/50 dark:bg-slate-800/40 transition-all space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-mono font-bold text-blue-600 dark:text-blue-400 text-xs">${app.id}</span>
+              ${getStageBadge(app.stage)}
+            </div>
+            <div class="font-bold text-slate-900 dark:text-white text-xs">${app.instName}</div>
+            <div class="text-[11px] text-slate-500 dark:text-slate-400">APH Route: <span class="font-semibold">${app.route}</span> &bull; Officer: ${app.officer}</div>
+            <div class="w-full h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+              <div class="h-full bg-blue-600 rounded-full" style="width: ${pct}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ============================================================================
+    // VIEW 4: EVC MANAGEMENT
+    // ============================================================================
+    function renderEvcTable() {
+      const tbody = document.getElementById('evcFullTableBody');
+      tbody.innerHTML = appState.evcSchedules.map(item => `
+        <tr class="hover:bg-slate-50/90 dark:hover:bg-slate-800/50 transition-colors">
+          <td class="py-3 px-4 font-mono font-bold text-blue-600 dark:text-blue-400">
+            <div>${item.evcId}</div>
+            <div class="text-[10px] text-slate-400">${item.appId}</div>
+          </td>
+          <td class="py-3 px-4 font-bold text-slate-900 dark:text-white">${item.instName}</td>
+          <td class="py-3 px-3 text-slate-600 dark:text-slate-300">${item.region}</td>
+          <td class="py-3 px-3">
+            <div class="font-mono font-semibold text-slate-800 dark:text-slate-200">${item.date}</div>
+            <div class="text-[11px] text-slate-500">${item.mode}</div>
+          </td>
+          <td class="py-3 px-3 text-slate-700 dark:text-slate-300">${item.chair}</td>
+          <td class="py-3 px-3">${getEvcStatusBadge(item.status)}</td>
+          <td class="py-3 px-3 font-mono font-bold text-emerald-600 dark:text-emerald-400">${item.score}%</td>
+          <td class="py-3 px-4 text-right">
+            <button onclick="openEvcReportModal('${item.evcId}')" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs">
+              Update Visit / Report
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openEvcReportModal(evcId) {
+      const item = appState.evcSchedules.find(e => e.evcId === evcId);
+      if (!item) return;
+      document.getElementById('evcModalId').value = item.evcId;
+      document.getElementById('evcModalSubtitle').textContent = `${item.evcId} • ${item.instName} (${item.region} Region)`;
+      document.getElementById('evcModalStatus').value = item.status;
+      document.getElementById('evcModalScore').value = item.score;
+      document.getElementById('evcModalRemarks').value = item.remarks;
+      document.getElementById('evcReportModal').classList.remove('hidden');
+    }
+
+    function closeEvcReportModal() {
+      document.getElementById('evcReportModal').classList.add('hidden');
+    }
+
+    function saveEvcReport(e) {
+      e.preventDefault();
+      const evcId = document.getElementById('evcModalId').value;
+      const item = appState.evcSchedules.find(x => x.evcId === evcId);
+      if (!item) return;
+
+      item.status = document.getElementById('evcModalStatus').value;
+      item.score = parseInt(document.getElementById('evcModalScore').value, 10) || 90;
+      item.remarks = document.getElementById('evcModalRemarks').value.trim();
+
+      appState.auditTrail.unshift({
+        time: '08 Nov 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        actor: `EVC Committee Chair (${item.chair.split('+')[0].trim()})`,
+        refId: item.evcId,
+        action: 'Updated EVC Inspection Report',
+        transition: `Status: ${item.status} (Score: ${item.score}%)`,
+        remarks: item.remarks
+      });
+
+      saveState();
+      closeEvcReportModal();
+      renderAll();
+      showToast('EVC Inspection Updated', `${item.instName} marked as "${item.status}" with score ${item.score}%.`, 'success');
+    }
+
+    function openNewEvcScheduleModal() {
+      const newEvc = {
+        evcId: 'EVC-2026-0' + (appState.evcSchedules.length + 1),
+        appId: 'APP-2026-104',
+        date: '29 Nov 2026',
+        instName: 'PQR College of Engineering',
+        region: 'Western',
+        mode: 'Physical Inspection',
+        chair: 'Prof. M. R. Kulkarni + 2 Experts',
+        status: 'Scheduled',
+        score: 89,
+        remarks: 'New EVC committee rostered via EVC Management Hub.'
+      };
+      appState.evcSchedules.unshift(newEvc);
+      appState.auditTrail.unshift({
+        time: '08 Nov 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        actor: 'AICTE EVC Cell Coordinator',
+        refId: newEvc.evcId,
+        action: 'Scheduled New EVC Inspection',
+        transition: 'Assigned: 29 Nov 2026',
+        remarks: `EVC scheduled for ${newEvc.instName}.`
+      });
+      saveState();
+      renderAll();
+      showToast('New EVC Visit Scheduled', `Rostered EVC inspection for ${newEvc.instName} on ${newEvc.date}.`, 'success');
+    }
+
+    // ============================================================================
+    // VIEW 5: COMPLIANCE & UNDERTAKINGS
+    // ============================================================================
+    function renderComplianceTable() {
+      const tbody = document.getElementById('complianceTableBody');
+      tbody.innerHTML = appState.undertakings.map(u => {
+        let badge = `<span class="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-semibold text-[11px]">Compliant</span>`;
+        if (u.status === 'Pending') badge = `<span class="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-semibold text-[11px]">Pending</span>`;
+        if (u.status === 'Overdue') badge = `<span class="px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 font-bold text-[11px]">Overdue</span>`;
+
+        return `
+          <tr class="hover:bg-slate-50/90 dark:hover:bg-slate-800/50 transition-colors">
+            <td class="py-3 px-4 font-mono font-bold text-slate-700 dark:text-slate-300">${u.id}</td>
+            <td class="py-3 px-4 font-bold text-slate-900 dark:text-white">${u.instName}</td>
+            <td class="py-3 px-3 text-slate-700 dark:text-slate-300 font-medium">${u.condition}</td>
+            <td class="py-3 px-3 font-mono text-[11px] text-slate-500">${u.clause}</td>
+            <td class="py-3 px-3 font-mono text-slate-700 dark:text-slate-300">${u.deadline}</td>
+            <td class="py-3 px-3 font-mono text-[11px] text-blue-600 dark:text-blue-400">${u.evidence}</td>
+            <td class="py-3 px-3">${badge}</td>
+            <td class="py-3 px-4 text-right">
+              ${u.status !== 'Compliant' ? `
+                <button onclick="verifyUndertaking('${u.id}')" class="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs">
+                  Verify &amp; Mark Compliant
+                </button>
+              ` : `<span class="text-emerald-600 dark:text-emerald-400 font-semibold text-xs">&#10003; Verified</span>`}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function verifyUndertaking(undId) {
+      const item = appState.undertakings.find(u => u.id === undId);
+      if (!item) return;
+      item.status = 'Compliant';
+      item.evidence = 'Verified_Compliance_Affidavit_2026.pdf';
+
+      appState.auditTrail.unshift({
+        time: '08 Nov 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        actor: 'AICTE Compliance Monitoring Cell',
+        refId: item.id,
+        action: 'Verified Institutional Undertaking',
+        transition: 'Status → Compliant',
+        remarks: `Verified ${item.condition} for ${item.instName}.`
+      });
+
+      saveState();
+      renderAll();
+      showToast('Compliance Undertaking Verified', `${item.instName} marked Compliant for ${item.clause}.`, 'success');
+    }
+
+    // ============================================================================
+    // VIEW 6: DOCUMENT EXPIRY MONITOR
+    // ============================================================================
+    function renderDocumentsTable() {
+      const filterVal = document.getElementById('docExpiryFilter').value;
+      const filtered = appState.documents.filter(d => filterVal === 'ALL' || d.status === filterVal);
+      const tbody = document.getElementById('documentsTableBody');
+
+      tbody.innerHTML = filtered.map(doc => {
+        const expDate = new Date(doc.expiryDate + 'T00:00:00');
+        const diffDays = Math.round((expDate - REF_TODAY) / (1000 * 60 * 60 * 24));
+        const windowText = diffDays < 0 ? `${Math.abs(diffDays)} days overdue` : `${diffDays} days remaining`;
+
+        return `
+          <tr class="hover:bg-slate-50/90 dark:hover:bg-slate-800/50 transition-colors">
+            <td class="py-3 px-4 font-mono font-bold text-slate-700 dark:text-slate-300">${doc.docId}</td>
+            <td class="py-3 px-4 font-bold text-slate-900 dark:text-white">${doc.instName}</td>
+            <td class="py-3 px-3 text-slate-700 dark:text-slate-300 font-medium">${doc.docType}</td>
+            <td class="py-3 px-3 font-mono text-slate-800 dark:text-slate-200">${doc.displayDate}</td>
+            <td class="py-3 px-3 font-mono text-xs ${diffDays < 0 ? 'text-rose-600 dark:text-rose-400 font-bold' : 'text-amber-700 dark:text-amber-300'}">${windowText}</td>
+            <td class="py-3 px-3">${getDocStatusBadge(doc.status)}</td>
+            <td class="py-3 px-4 text-right space-x-1.5">
+              <button onclick="sendSingleExpiryReminder('${doc.docId}')" class="px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-800 dark:text-amber-300 border border-amber-500/30 font-semibold text-xs">
+                Send Reminder
+              </button>
+              <button onclick="renewDocumentDate('${doc.docId}')" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs">
+                Record Renewal
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function sendSingleExpiryReminder(docId) {
+      const doc = appState.documents.find(d => d.docId === docId);
+      if (!doc) return;
+      appState.alertsFeed.unshift({
+        id: 'ALT-' + Math.floor(100 + Math.random() * 899),
+        time: 'Just now',
+        channel: 'SMS + Email',
+        severity: doc.status === 'Overdue' ? 'Overdue' : 'Expiring Soon',
+        target: doc.instName,
+        message: `EXPIRY NOTICE: ${doc.docType} (${doc.displayDate}) requires immediate renewal upload on AICTE FlowTrack.`
+      });
+      saveState();
+      renderAll();
+      showToast('Expiry Alert Dispatched', `Simulated SMS & Email reminder sent to ${doc.instName} for ${doc.docType}.`, 'warning');
+    }
+
+    function renewDocumentDate(docId) {
+      const doc = appState.documents.find(d => d.docId === docId);
+      if (!doc) return;
+      doc.expiryDate = '2029-11-30';
+      doc.displayDate = '30 Nov 2029';
+      doc.status = 'Valid';
+
+      appState.auditTrail.unshift({
+        time: '08 Nov 2026, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        actor: 'AICTE Document Verification Desk',
+        refId: doc.docId,
+        action: 'Verified Document Renewal',
+        transition: 'Status → Valid (Renewed till 30 Nov 2029)',
+        remarks: `Renewed ${doc.docType} uploaded and verified for ${doc.instName}.`
+      });
+
+      saveState();
+      renderAll();
+      showToast('Document Renewal Recorded', `${doc.instName} – ${doc.docType} updated to Valid (30 Nov 2029).`, 'success');
+    }
+
+    function sendBulkExpiryAlerts() {
+      const count = appState.documents.filter(d => d.status !== 'Valid').length;
+      showToast('Bulk Expiry Reminders Sent', `Dispatched SMS/Email alerts for ${count} expiring or overdue statutory documents.`, 'warning');
+    }
+
+    // ============================================================================
+    // VIEW 7: ALERTS & ESCALATION RULES
+    // ============================================================================
+    function renderAlertsAndRules() {
+      const rulesEl = document.getElementById('notificationRulesList');
+      rulesEl.innerHTML = appState.notificationRules.map(r => `
+        <div class="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 flex items-center justify-between gap-3">
+          <div>
+            <div class="text-xs font-bold text-slate-900 dark:text-white">${r.name}</div>
+            <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">${r.desc}</div>
+          </div>
+          <button onclick="toggleNotificationRule('${r.id}')" class="w-11 h-6 rounded-full transition-colors p-0.5 shrink-0 ${r.enabled ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-700'}">
+            <div class="w-5 h-5 rounded-full bg-white shadow-xs transform transition-transform ${r.enabled ? 'translate-x-5' : 'translate-x-0'}"></div>
+          </button>
+        </div>
+      `).join('');
+
+      document.getElementById('alertsCountBadge').textContent = `${appState.alertsFeed.length} Dispatched`;
+      const feedEl = document.getElementById('alertsFeedContainer');
+      feedEl.innerHTML = appState.alertsFeed.map(a => {
+        let border = 'border-l-blue-500';
+        if (a.severity === 'Overdue') border = 'border-l-rose-500';
+        if (a.severity === 'Expiring Soon') border = 'border-l-amber-500';
+        return `
+          <div class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 border-l-4 ${border} bg-slate-50/70 dark:bg-slate-800/50 space-y-1">
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="font-bold text-slate-900 dark:text-white">${a.target}</span>
+              <span class="font-mono text-slate-400">${a.time} &bull; ${a.channel}</span>
+            </div>
+            <p class="text-xs text-slate-700 dark:text-slate-300">${a.message}</p>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleNotificationRule(ruleId) {
+      const rule = appState.notificationRules.find(r => r.id === ruleId);
+      if (!rule) return;
+      rule.enabled = !rule.enabled;
+      saveState();
+      renderAlertsAndRules();
+      showToast('Notification Rule Updated', `${rule.name} is now ${rule.enabled ? 'ENABLED' : 'DISABLED'}.`, 'info');
+    }
+
+    function triggerSlaScan() {
+      appState.alertsFeed.unshift({
+        id: 'ALT-' + Math.floor(100 + Math.random() * 899),
+        time: 'Just now',
+        channel: 'Automated Rule Scan',
+        severity: 'Expiring Soon',
+        target: 'All Regional Offices',
+        message: 'SLA & Expiry Scan Completed: 2 Overdue documents and 3 Expiring leases flagged for immediate follow-up.'
+      });
+      saveState();
+      renderAll();
+      showToast('SLA & Document Expiry Scan Complete', ' Automated reminders and escalation flags updated across all queues.', 'success');
+    }
+
+    // ============================================================================
+    // VIEW 8: REPORTS & AUDIT TRAIL
+    // ============================================================================
+    function renderReportsAndAudit() {
+      const regions = ['Western', 'Northern', 'Southern', 'Eastern', 'Central'];
+      const regGrid = document.getElementById('regionalSummaryGrid');
+      regGrid.innerHTML = regions.map((reg, i) => {
+        const count = [340, 295, 310, 185, 162][i];
+        return `
+          <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
+            <div class="text-xs font-semibold text-slate-500 dark:text-slate-400">${reg} Region</div>
+            <div class="text-xl font-extrabold text-slate-900 dark:text-white font-mono mt-1">${count} Apps</div>
+            <div class="text-[11px] text-emerald-600 dark:text-emerald-400 mt-0.5">APH SLA Tracked</div>
+          </div>
+        `;
+      }).join('');
+
+      const tbody = document.getElementById('auditTrailTableBody');
+      tbody.innerHTML = appState.auditTrail.map(log => `
+        <tr class="hover:bg-slate-50/90 dark:hover:bg-slate-800/50 transition-colors">
+          <td class="py-2.5 px-4 font-mono text-[11px] text-slate-500 dark:text-slate-400 whitespace-nowrap">${log.time}</td>
+          <td class="py-2.5 px-3 font-semibold text-slate-900 dark:text-white">${log.actor}</td>
+          <td class="py-2.5 px-3 font-mono font-bold text-blue-600 dark:text-blue-400">${log.refId}</td>
+          <td class="py-2.5 px-3 font-medium text-slate-800 dark:text-slate-200">${log.action}</td>
+          <td class="py-2.5 px-3 font-mono text-[11px] text-emerald-700 dark:text-emerald-400">${log.transition}</td>
+          <td class="py-2.5 px-4 text-slate-600 dark:text-slate-300">${log.remarks}</td>
+        </tr>
+      `).join('');
+    }
+
+    function exportAuditTrailCsv() {
+      const headers = ['Timestamp', 'Actor', 'Reference ID', 'Action', 'Stage Transition', 'Remarks'];
+      const rows = appState.auditTrail.map(l => [l.time, l.actor, l.refId, l.action, l.transition, l.remarks]);
+      const csvContent = 'data:text/csv;charset=utf-8,' + [headers, ...rows].map(e => e.map(x => `"${(x || '').replace(/"/g, '""')}"`).join(',')).join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', 'AICTE_FlowTrack_SIH26262_Audit_Trail.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('Audit Trail CSV Exported', 'Downloaded AICTE_FlowTrack_SIH26262_Audit_Trail.csv.', 'success');
+    }
+
+    // ============================================================================
+    // MODALS: APH MATRIX & RESET CONFIRMATION
+    // ============================================================================
+    function openAphRouteMatrixModal() {
+      document.getElementById('aphMatrixModal').classList.remove('hidden');
+    }
+    function closeAphRouteMatrixModal() {
+      document.getElementById('aphMatrixModal').classList.add('hidden');
+    }
+    function openResetConfirmModal() {
+      document.getElementById('resetConfirmModal').classList.remove('hidden');
+    }
+    function closeResetConfirmModal() {
+      document.getElementById('resetConfirmModal').classList.add('hidden');
+    }
+    function confirmResetDemoData() {
+      appState = getInitialSeedState();
+      saveState();
+      closeResetConfirmModal();
+      navigate('dashboard');
+      showToast('Baseline Data Restored', 'All SIH26262 metrics (1,292 total applications) and schedules reset to initial state.', 'info');
+    }
+
+    // ============================================================================
+    // MASTER RENDER & INITIALIZATION
+    // ============================================================================
+    function renderAll() {
+      renderDashboard();
+      renderApplicationsTable();
+      renderPortalTracker();
+      renderEvcTable();
+      renderComplianceTable();
+      renderDocumentsTable();
+      renderAlertsAndRules();
+      renderReportsAndAudit();
+    }
+
+    window.onload = function () {
+      initTheme();
+      updateFormRoutePreview();
+      navigate(appState.currentView || 'dashboard');
+    };
+  </script>
+</body>
+</html>
